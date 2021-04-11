@@ -1,11 +1,9 @@
-﻿using MediatR;
-using MediatR.IPC;
-using MediatR.IPC.Messages;
+﻿using MediatR.IPC.Messages;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace MediatR.IPCs
+namespace MediatR.IPC
 {
     public class MediatorServer : MediatorServerBase
     {

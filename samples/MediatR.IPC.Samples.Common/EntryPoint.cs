@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace MediatR.IPC.Samples.Common
 {
@@ -14,11 +9,13 @@ namespace MediatR.IPC.Samples.Common
             IPCMediator.UseTransport(IPCTransport.NamedPipe);
 
             IPCMediator
-                .RegisterAssemblyTypes(Assembly.GetAssembly(typeof(AssemblyScan.AssemblyScan)))
+                .RegisterAssemblyTypes(Assembly.GetExecutingAssembly())
                 .WithAttribute<IPCRequestAttribute>();
 
             IPCMediator
                 .RegisterType<ApplicationStateQuery>();
+
+            var server = new MediatorServerPool(sender, "")
         }
     }
 }

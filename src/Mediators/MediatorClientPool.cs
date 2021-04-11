@@ -1,10 +1,9 @@
-﻿using MediatR;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPCs
+namespace MediatR.IPC
 {
     public class MediatorClientPool : ISender
     {

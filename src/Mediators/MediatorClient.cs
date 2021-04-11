@@ -1,11 +1,9 @@
-﻿using MediatR;
-using MediatR.IPC;
-using MediatR.IPC.Exceptions;
+﻿using MediatR.IPC.Exceptions;
 using MediatR.IPC.Messages;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPCs
+namespace MediatR.IPC
 {
     public class MediatorClient : MediatorClientBase
     {
