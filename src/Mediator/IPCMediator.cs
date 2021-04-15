@@ -9,6 +9,9 @@ namespace MediatR
 {
     public abstract partial class IPCMediator : IDisposable
     {
+        private static readonly object finalizerLock = new();
+        private static bool finalized;
+
         private static IStreamStratergy streamStratergy = IPCTransport.Default;
 
         private readonly CancellationTokenSource cts = new();
@@ -19,6 +22,14 @@ namespace MediatR
         protected IPCMediator(string pipeName)
         {
             this.pipeName = pipeName;
+            lock(finalizerLock)
+            {
+                if (!finalized)
+                {
+                    FinalizeUnfinalized();
+                    finalized = true;
+                }
+            }
         }
 
         protected CancellationToken Token => cts.Token;

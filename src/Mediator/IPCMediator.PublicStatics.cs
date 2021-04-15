@@ -31,7 +31,7 @@ namespace MediatR
             var requests = assembly.ExportedTypes
                 .Where(t => t
                     .GetInterfaces()
-                    .Any(i => i == RequestType)
+                    .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == RequestType)
                 );
 
             var builder = new IPCBuilder<Assembly, IEnumerable<Type>>(requests);
@@ -76,6 +76,17 @@ namespace MediatR
             }
 
             streamStratergy = stratergy;
+        }
+
+        private static void FinalizeUnfinalized()
+        {
+            var unfinalizedTypes = UnfinalizedRequests.SelectMany(r => r.Value);
+            foreach (var unfinalized in unfinalizedTypes)
+            {
+                Requests.Add(Finalize(unfinalized));
+            }
+
+            UnfinalizedRequests.Clear();
         }
 
         private static Request Finalize(Type request)
