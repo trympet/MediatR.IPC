@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MediatR.IPC.Samples.AutoFac": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
