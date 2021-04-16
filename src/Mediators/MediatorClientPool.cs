@@ -38,7 +38,7 @@ namespace MediatR.IPC
             var client = clients.Pop();
             try
             {
-                return await client.SendAsync(request).ConfigureAwait(false);
+                return await client.Send(request).ConfigureAwait(false);
             }
             finally
             {
