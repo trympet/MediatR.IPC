@@ -8,10 +8,17 @@ using System.Threading.Tasks;
 
 namespace MediatR.IPC
 {
+    /// <summary>
+    /// Represents the base class used by all mediator servers.
+    /// </summary>
     public abstract class MediatorServerBase : IPCMediator, IDisposable
     {
         protected MediatorServerBase(string pipeName) : base(pipeName) { }
 
+        /// <summary>
+        /// Runs the server.
+        /// </summary>
+        /// <returns>A task that completes once the server is disposed.</returns>
         public async Task Run()
         {
             try

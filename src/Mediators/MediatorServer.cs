@@ -5,11 +5,20 @@ using System.Threading.Tasks;
 
 namespace MediatR.IPC
 {
+    /// <summary>
+    /// Represents a runner for receiving and dispatching IPC messages.
+    /// </summary>
     public class MediatorServer : MediatorServerBase
     {
         private readonly ISender sender;
 
-        public MediatorServer(ISender sender, string name, uint id)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MediatorServer"/> class.
+        /// </summary>
+        /// <param name="sender">The sender to use for dispatching events.</param>
+        /// <param name="name">The name of the pool.</param>
+        /// <param name="id">The id of the server.</param>
+        public MediatorServer(ISender sender, string name, uint id = 0)
             : base($"{name}{(char)(id + 65)}")
         {
             this.sender = sender;

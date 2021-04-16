@@ -7,6 +7,12 @@ namespace MediatR
 {
     public static class IPCBuilderExtensions
     {
+        /// <summary>
+        /// Registers types which implement the specified attribute.
+        /// </summary>
+        /// <typeparam name="TAttribute">The attribute to filter for.</typeparam>
+        /// <param name="builder">Builder</param>
+        /// <returns>A builder.</returns>
         public static IPCBuilder<Type, IEnumerable<Type>> WithAttribute<TAttribute>(this IPCBuilder<Assembly, IEnumerable<Type>> builder)
         {
             var attributeType = typeof(TAttribute);
@@ -18,6 +24,13 @@ namespace MediatR
             return builder.Update<Type>(newContext);
         }
 
+
+        /// <summary>
+        /// Filters types by a given predicate.
+        /// </summary>
+        /// <typeparam name="TContext"></typeparam>
+        /// <param name="builder">Builder.</param>
+        /// <param name="predicate">The predicate for filtering types.</param>
         public static void Where<TContext>(this IPCBuilder<Assembly, IEnumerable<Type>> builder, Func<Type, bool> predicate)
         {
             var types = builder.Context;

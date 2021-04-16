@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace MediatR.IPC
 {
+    /// <summary>
+    /// Represents the base class used by mediator clients.
+    /// </summary>
     public abstract class MediatorClientBase : IPCMediator
     {
         protected MediatorClientBase(string pipeName)
