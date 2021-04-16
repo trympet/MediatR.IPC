@@ -11,6 +11,9 @@
     <Description>An IPC proxy for use with MediatR.</Description>
     <PackageProjectUrl>https://github.com/trympet/MediatR.IPC</PackageProjectUrl>
     <RepositoryUrl>https://github.com/trympet/MediatR.IPC</RepositoryUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <PackageTags>mediatr mediator ipc inter-process</PackageTags>
+    <PackageLicenseExpression>GPL-2.0-only</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
