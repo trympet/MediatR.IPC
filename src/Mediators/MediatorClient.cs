@@ -5,15 +5,17 @@ using System.Threading.Tasks;
 
 namespace MediatR.IPC
 {
-    public class MediatorClient : MediatorClientBase
+    /// <summary>
+    /// Represents a mediator client, used for sending messages.
+    /// </summary>
+    public class MediatorClient : MediatorClientBase, ISender
     {
         private readonly SemaphoreSlim pipeSemaphore = new(1, 1);
 
         public MediatorClient(string name, uint id)
             : base($"{name}{(char)(id + 65)}") { }
 
-        public async Task<TResponse> SendAsync<TRequest, TResponse>(TRequest request)
-            where TRequest : IRequest<TResponse>
+        public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
             await pipeSemaphore.WaitAsync().ConfigureAwait(false);
             try
@@ -29,11 +31,8 @@ namespace MediatR.IPC
             }
         }
 
-        public Task SendAsync<TRequest>(TRequest request)
-            where TRequest : IRequest
-        {
-            return SendAsync<TRequest, Unit>(request);
-        }
+        public Task<object?> Send(object request, CancellationToken cancellationToken = default)
+            => Send(request, cancellationToken);
 
         private TResponse DeserializeResponse<TResponse>(Message response)
         {

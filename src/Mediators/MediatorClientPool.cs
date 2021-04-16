@@ -32,14 +32,13 @@ namespace MediatR.IPC
             }
         }
 
-        public async Task<TResponse> SendAsync<TRequest, TResponse>(TRequest request)
-            where TRequest : IRequest<TResponse>
+        public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
             await poolSemaphore.WaitAsync();
             var client = clients.Pop();
             try
             {
-                return await client.SendAsync<TRequest, TResponse>(request).ConfigureAwait(false);
+                return await client.SendAsync(request).ConfigureAwait(false);
             }
             finally
             {
@@ -47,15 +46,6 @@ namespace MediatR.IPC
                 poolSemaphore.Release();
             }
         }
-
-        public Task SendAsync<TRequest>(TRequest request)
-            where TRequest : IRequest, new()
-        {
-            return SendAsync<TRequest, Unit>(request);
-        }
-
-        public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
-            => SendAsync<IRequest<TResponse>, TResponse>(request);
 
         public Task<object?> Send(object request, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
