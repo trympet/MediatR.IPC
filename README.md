@@ -9,7 +9,7 @@ All IPC requests need to be registered. This can be done via assembly scanning o
 Since IPCs have different app domains, the registration will need to be done on the client and server.
 I recommend using a shared assembly which does this for you.
 
-#### Process 1 (Backend)
+#### Process 1 (Command Handler)
 ```csharp
 [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
 public record MyFancyCommand : IRequest<bool>
@@ -35,7 +35,7 @@ public static async Task Main(string[] args)
 }
 ```
 
-#### Process 2 (Frontend)
+#### Process 2 (Request sender)
 ```csharp
 public static async Task Main(string[] args)
 {
