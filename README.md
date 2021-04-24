@@ -72,3 +72,10 @@ Notifications are a work in progress. `NotificationHandler`s need to be register
 
 ## Exceptions
 Currently, exceptions thrown by request handlers are not serialized, and no type information is preserved. Exceptions can be huge, and there is no garantue that the client process has a reference to the `Exception`-type thrown. Ideas and suggestions are welcome!
+
+## Contributing
+All forms of contribution are welcome! Here is a list of some much needed features.
+- [ ] Request cancellation with `CancellationToken`
+- [ ] Dynamic buffers for requests in `MediatorServerBase`
+- [ ] `IPublisher` implementation
+- [ ]  Routing of `INotification` to `INotificationHandler` designated for IPC via DI container.
