@@ -8,7 +8,7 @@
     <RootNamespace>MediatR.IPC</RootNamespace>
     <Authors>Trym Lund Flogard</Authors>
     <Company>Konfluent AS</Company>
-    <Description>An IPC proxy for use with MediatR.</Description>
+    <Description>An IPC implementation of MediatR with support for Named Pipes and Unix Domain Sockets using Protobuf. Register IPC requests with assembly scanning or fluent registration. Support for connection pooling and request cancellation.</Description>
     <PackageProjectUrl>https://github.com/trympet/MediatR.IPC</PackageProjectUrl>
     <RepositoryUrl>https://github.com/trympet/MediatR.IPC</RepositoryUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
