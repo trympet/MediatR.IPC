@@ -9,7 +9,7 @@ All IPC requests need to be registered. This can be done via assembly scanning o
 Since IPCs have different app domains, the registration will need to be done on the client and server.
 I recommend using a shared assembly which does this for you.
 
-#### Process 1 (Backend)
+#### Process 1 (Command Handler)
 ```csharp
 [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
 public record MyFancyCommand : IRequest<bool>
@@ -35,7 +35,7 @@ public static async Task Main(string[] args)
 }
 ```
 
-#### Process 2 (Frontend)
+#### Process 2 (Request sender)
 ```csharp
 public static async Task Main(string[] args)
 {
@@ -72,3 +72,10 @@ Notifications are a work in progress. `NotificationHandler`s need to be register
 
 ## Exceptions
 Currently, exceptions thrown by request handlers are not serialized, and no type information is preserved. Exceptions can be huge, and there is no garantue that the client process has a reference to the `Exception`-type thrown. Ideas and suggestions are welcome!
+
+## Contributing
+All forms of contribution are welcome! Here is a list of some much needed features.
+- [ ] Request cancellation with `CancellationToken`
+- [ ] Dynamic buffers for requests in `MediatorServerBase`
+- [ ] `IPublisher` implementation
+- [ ]  Routing of `INotification` to `INotificationHandler` designated for IPC via DI container.
