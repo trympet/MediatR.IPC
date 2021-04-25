@@ -14,6 +14,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <PackageTags>mediatr mediator ipc inter-process</PackageTags>
     <PackageLicenseExpression>GPL-2.0-only</PackageLicenseExpression>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
