@@ -13,7 +13,7 @@ namespace MediatR.IPC.Notifications
 
         public event EventHandler<INotification>? Notification;
 
-        private protected override Task ProcessMessage(Request request, object message, Stream _, CancellationToken token)
+        protected override Task ProcessMessage(Request request, object message, Stream _, CancellationToken token)
         {
             if (message is INotification notification)
             {

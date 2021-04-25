@@ -2,6 +2,7 @@
 using MediatR.IPC.Messages;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,10 +32,16 @@ namespace MediatR
                     finalized = true;
                 }
             }
+
+            LifetimeToken = cts.Token;
         }
 
-        protected CancellationToken Token => cts.Token;
+        protected CancellationToken LifetimeToken { get; }
 
+        /// <summary>
+        /// Releases unmanaged resources consumed by this instance.
+        /// All ongoing requests are cancelled and control is resumed to the callsite.
+        /// </summary>
         public void Dispose()
         {
             Dispose(disposing: true);
@@ -70,10 +77,16 @@ namespace MediatR
             return buffer;
         }
 
-        protected async Task<Stream> PrepareStreamAsync(StreamType type, CancellationToken token)
+        /// <summary>
+        /// Creates a stream and registers it to the lifetime of the current instance.
+        /// </summary>
+        /// <param name="type">A value indicating what type of stream to create</param>
+        /// <param name="token">A token which will signal cancellation to the adversary and close the stream upon cancellation.</param>
+        /// <returns>A connected, unidirectional stream.</returns>
+        protected async Task<Stream> CreateAndRegisterStreamAsync(StreamType type, CancellationToken token = default)
         {
             linkedCts?.Dispose();
-            linkedCts = CancellationTokenSource.CreateLinkedTokenSource(Token, token);
+            linkedCts = CancellationTokenSource.CreateLinkedTokenSource(LifetimeToken, token);
             var pipeToken = linkedCts.Token;
             pipeToken.ThrowIfCancellationRequested();
 
@@ -81,6 +94,11 @@ namespace MediatR
             pipeToken.Register(() => stream.Close());
             return stream;
 
+        }
+
+        private protected static Request? FindRequest(Message message)
+        {
+            return Requests.FirstOrDefault(r => r.Name == message.Name);
         }
 
         private protected static object DeserializeContent(Message message, Type contentType)

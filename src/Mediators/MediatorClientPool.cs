@@ -47,7 +47,19 @@ namespace MediatR.IPC
             }
         }
 
-        public Task<object?> Send(object request, CancellationToken cancellationToken = default)
-            => throw new NotImplementedException();
+        public async Task<object?> Send(object request, CancellationToken cancellationToken = default)
+        {
+            await poolSemaphore.WaitAsync(cancellationToken);
+            var client = clients.Pop();
+            try
+            {
+                return await client.Send(request, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                clients.Push(client);
+                poolSemaphore.Release();
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace MediatR.IPC
     /// </summary>
     public abstract class MediatorServerBase : IPCMediator, IDisposable
     {
+        private CancellationToken requestLifetimeToken;
         protected MediatorServerBase(string pipeName) : base(pipeName) { }
 
         /// <summary>
@@ -28,35 +29,34 @@ namespace MediatR.IPC
             catch (OperationCanceledException) { }
         }
 
+        /// <summary>
+        /// Processes and acts upon an incoming message or request.
+        /// </summary>
+        /// <param name="request">The original request received by the server.</param>
+        /// <param name="message">The deserialized content of the message.</param>
+        /// <param name="responseStream">A stream for sending a response.</param>
+        /// <param name="token">A lifetime token for the current message.</param>
+        /// <returns>A task which completes once the message is processed.</returns>
+        protected abstract Task ProcessMessage(Request request, object message, Stream responseStream, CancellationToken token);
+
         private async Task RunUntilCancellation()
         {
-            var token = Token;
-
-            while (!token.IsCancellationRequested)
+            while (!LifetimeToken.IsCancellationRequested)
             {
-                using var pipe = await PrepareStreamAsync(StreamType.ServerStream, token).ConfigureAwait(false);
-                var buffer = new byte[4096];
-                var numBytes = await pipe.ReadAsync(buffer, token);
-                var result = new Memory<byte>(buffer).Slice(0, numBytes);
-                var message = Serializer.Deserialize<Message>(result);
+                using var stream = await CreateAndRegisterStreamAsync(StreamType.ServerStream).ConfigureAwait(false);
+                var message = await DeserializeRequest(stream);
 
-                var request = FindRequest(message);
-                if (request is null)
-                {
-                    Debug.Fail($"Request not recognized: {message.Name}");
-                    continue;
-                }
+                var request = FindRequest(message)
+                    ?? throw new InvalidOperationException($"Request not recognized: {message.Name}");
 
-                object messageContent = DeserializeContent(message, request.RequestType);
-                await ProcessMessageUntilCancellation(request, messageContent, pipe, token).ConfigureAwait(false);
+                var messageContent = DeserializeContent(message, request.RequestType);
+                await ProcessMessage(request, messageContent, stream).ConfigureAwait(false);
             }
         }
 
-        private protected abstract Task ProcessMessage(Request request, object message, Stream responseStream, CancellationToken token);
-
-        private protected async Task ProcessMessageUntilCancellation(Request request, object message, Stream responseStream, CancellationToken token)
+        private async Task ProcessMessage(Request request, object message, Stream responseStream)
         {
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(LifetimeToken);
             var requestToken = cts.Token;
             try
             {
@@ -73,14 +73,18 @@ namespace MediatR.IPC
             }
         }
 
+        private async Task<Message> DeserializeRequest(Stream stream)
+        {
+            var buffer = new Memory<byte>(new byte[4096]);
+            var numBytes = await stream.ReadAsync(buffer, LifetimeToken);
+            var result = buffer.Slice(0, numBytes);
+            var message = Serializer.Deserialize<Message>(result);
+            return message;
+        }
+
         private static Task<int> GetStreamEofTask(Stream responseStream, CancellationToken requestToken)
         {
             return responseStream.ReadAsync(new byte[1], requestToken).AsTask();
-        }
-
-        private static Request? FindRequest(Message message)
-        {
-            return Requests.FirstOrDefault(r => r.Name == message.Name);
         }
     }
 }

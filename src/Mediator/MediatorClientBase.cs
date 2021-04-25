@@ -12,7 +12,14 @@ namespace MediatR.IPC
         protected MediatorClientBase(string pipeName)
             : base(pipeName) { }
 
-        private protected async Task SendMessageAsync<TMessage>(TMessage message, Stream stream)
+        /// <summary>
+        /// Sends a message to the server.
+        /// </summary>
+        /// <typeparam name="TMessage">The message type</typeparam>
+        /// <param name="message">The message.</param>
+        /// <param name="stream">The stream to send the message over.</param>
+        /// <returns></returns>
+        protected async Task SendMessageAsync<TMessage>(TMessage message, Stream stream)
             where TMessage : notnull
         {
             var requestSerialized = await SerializeRequestAsync(message).ConfigureAwait(false);

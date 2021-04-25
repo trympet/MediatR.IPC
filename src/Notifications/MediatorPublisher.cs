@@ -10,7 +10,7 @@ namespace MediatR.IPC.Notifications
 
         public async Task Publish(object notification, CancellationToken cancellationToken = default)
         {
-            using var pipe = await PrepareStreamAsync(StreamType.ClientStream, cancellationToken).ConfigureAwait(false);
+            using var pipe = await CreateAndRegisterStreamAsync(StreamType.ClientStream, cancellationToken).ConfigureAwait(false);
             await SendMessageAsync(notification, pipe);
         }
 
