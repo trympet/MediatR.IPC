@@ -1,6 +1,7 @@
 ﻿using MediatR.IPC.Messages;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MediatR.IPC
@@ -24,19 +25,43 @@ namespace MediatR.IPC
             this.sender = sender;
         }
 
-        private protected override async Task ProcessMessage(Request request, object message, Stream responseStream)
+        private protected override async Task ProcessMessage(Request request, object message, Stream responseStream, CancellationToken token)
         {
             object? response;
             try
             {
-                response = await sender.Send(message).ConfigureAwait(false);
+                response = await sender.Send(message, token).ConfigureAwait(false);
             }
+            catch (TaskCanceledException) { throw; }
             catch (Exception e)
             {
                 response = e;
             }
 
             await SendResponseAsync(request, response, responseStream);
+            //object? response;
+            //try
+            //{
+            //    using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+            //    var requestTask = sender.Send(message, cts.Token);
+            //    var streamEofTask = responseStream.ReadAsync(new byte[1], cts.Token);
+            //    var res = await Task.WhenAny(requestTask, streamEofTask.AsTask()).ConfigureAwait(false);
+            //    if (res is Task<object?>  res1)
+            //    {
+            //        response = res1.Result;
+            //    }
+            //    else
+            //    {
+            //        cts.Cancel();
+            //        throw new TaskCanceledException();
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    response = e;
+            //}
+
+            //await SendResponseAsync(request, response, responseStream);
         }
 
         private async Task SendResponseAsync(Request request, object? response, Stream stream)

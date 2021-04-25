@@ -34,11 +34,11 @@ namespace MediatR.IPC
 
         public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
-            await poolSemaphore.WaitAsync();
+            await poolSemaphore.WaitAsync(cancellationToken);
             var client = clients.Pop();
             try
             {
-                return await client.Send(request).ConfigureAwait(false);
+                return await client.Send(request, cancellationToken).ConfigureAwait(false);
             }
             finally
             {

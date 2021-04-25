@@ -18,6 +18,7 @@ namespace MediatR
         private readonly string pipeName;
 
         private bool disposedValue;
+        private CancellationTokenSource? linkedCts;
 
         protected IPCMediator(string pipeName)
         {
@@ -71,11 +72,15 @@ namespace MediatR
 
         protected async Task<Stream> PrepareStreamAsync(StreamType type, CancellationToken token)
         {
-            using var compositeCts = CancellationTokenSource.CreateLinkedTokenSource(Token, token);
-            var pipeToken = compositeCts.Token;
+            linkedCts?.Dispose();
+            linkedCts = CancellationTokenSource.CreateLinkedTokenSource(Token, token);
+            var pipeToken = linkedCts.Token;
             pipeToken.ThrowIfCancellationRequested();
 
-            return await streamStratergy.Provide(type, pipeName, pipeToken).ConfigureAwait(false);
+            var stream = await streamStratergy.Provide(type, pipeName, pipeToken).ConfigureAwait(false);
+            pipeToken.Register(() => stream.Close());
+            return stream;
+
         }
 
         private protected static object DeserializeContent(Message message, Type contentType)

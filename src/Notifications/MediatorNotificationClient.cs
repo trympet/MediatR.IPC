@@ -1,6 +1,7 @@
 ﻿using MediatR.IPC.Messages;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MediatR.IPC.Notifications
@@ -12,7 +13,7 @@ namespace MediatR.IPC.Notifications
 
         public event EventHandler<INotification>? Notification;
 
-        private protected override Task ProcessMessage(Request request, object message, Stream _)
+        private protected override Task ProcessMessage(Request request, object message, Stream _, CancellationToken token)
         {
             if (message is INotification notification)
             {

@@ -14,14 +14,12 @@ namespace MediatR.IPC
                 if (type == StreamType.ClientStream)
                 {
                     var pipe = new NamedPipeClientStream(".", streamName, PipeDirection.InOut, PipeOptions.Asynchronous);
-                    token.Register(() => pipe.Close());
                     await pipe.ConnectAsync(token).ConfigureAwait(false);
                     return pipe;
                 }
                 else
                 {
                     var pipe = new NamedPipeServerStream(streamName, PipeDirection.InOut, 10, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-                    token.Register(() => pipe.Close());
                     await pipe.WaitForConnectionAsync(token).ConfigureAwait(false);
                     return pipe;
                 }

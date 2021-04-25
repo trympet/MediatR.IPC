@@ -17,11 +17,12 @@ namespace MediatR.IPC
 
         public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
-            await pipeSemaphore.WaitAsync().ConfigureAwait(false);
+            await pipeSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
-                using var pipe = await PrepareStreamAsync(StreamType.ClientStream, CancellationToken.None).ConfigureAwait(false);
+                using var pipe = await PrepareStreamAsync(StreamType.ClientStream, cancellationToken).ConfigureAwait(false);
                 await SendMessageAsync(request, pipe).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
                 var response = Serializer.Deserialize<Message>(pipe);
                 return DeserializeResponse<TResponse>(response);
             }
