@@ -10,6 +10,7 @@ namespace MediatR
 {
     public abstract partial class IPCMediator
     {
+        private static readonly Type NotificationType = typeof(INotification);
         private static readonly Type RequestType = typeof(IRequest<>);
         private static readonly Type UnitType = typeof(Unit);
 
@@ -29,9 +30,9 @@ namespace MediatR
         {
             var types = assembly.ExportedTypes;
             var requests = assembly.ExportedTypes
-                .Where(t => t
+                .Where<Type>(t => t
                     .GetInterfaces()
-                    .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == RequestType)
+                    .Any(i => IsRequest(i) || IsNotification(i))
                 );
 
             var builder = new IPCBuilder<Assembly, IEnumerable<Type>>(requests);
@@ -39,6 +40,13 @@ namespace MediatR
 
             return builder;
         }
+
+        private static bool IsRequest(Type i)
+            => i.IsGenericType && i.GetGenericTypeDefinition() == RequestType;
+
+
+        private static bool IsNotification(Type i)
+            => i == NotificationType;
 
         /// <summary>
         /// Registers a request to be handled by the IPC mediator.
