@@ -70,7 +70,7 @@ namespace MediatR.IPC
 
             if (response.IsNullResponse)
             {
-                return default!;
+                return default(Unit);
             }
 
             return DeserializeContent(response , contentType);
