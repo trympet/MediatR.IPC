@@ -23,7 +23,7 @@ namespace MediatR.IPC
             where TMessage : notnull
         {
             var requestSerialized = await SerializeRequestAsync(message).ConfigureAwait(false);
-            var request = new Message(message.GetType().FullName, requestSerialized);
+            var request = new Message(message.GetType().FullName ?? "UNKNOWN", requestSerialized);
             Serializer.Serialize(stream, request);
         }
     }
