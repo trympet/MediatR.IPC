@@ -34,7 +34,7 @@ namespace MediatR.IPC
 
         public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
-            await poolSemaphore.WaitAsync(cancellationToken);
+            await poolSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
             var client = clients.Pop();
             try
             {
@@ -49,7 +49,7 @@ namespace MediatR.IPC
 
         public async Task<object?> Send(object request, CancellationToken cancellationToken = default)
         {
-            await poolSemaphore.WaitAsync(cancellationToken);
+            await poolSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
             var client = clients.Pop();
             try
             {

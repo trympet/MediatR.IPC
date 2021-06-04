@@ -73,7 +73,7 @@ namespace MediatR
             Serializer.Serialize(serializationStream, request);
             serializationStream.Position = 0;
             var buffer = new byte[serializationStream.Length];
-            await serializationStream.ReadAsync(buffer);
+            await serializationStream.ReadAsync(buffer).ConfigureAwait(false);
             return buffer;
         }
 

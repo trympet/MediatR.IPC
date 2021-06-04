@@ -44,7 +44,7 @@ namespace MediatR.IPC
             while (!LifetimeToken.IsCancellationRequested)
             {
                 using var stream = await CreateAndRegisterStreamAsync(StreamType.ServerStream).ConfigureAwait(false);
-                var message = await DeserializeRequest(stream);
+                var message = await DeserializeRequest(stream).ConfigureAwait(false);
 
                 var request = FindRequest(message)
                     ?? throw new InvalidOperationException($"Request not recognized: {message.Name}");
@@ -76,7 +76,7 @@ namespace MediatR.IPC
         private async Task<Message> DeserializeRequest(Stream stream)
         {
             var buffer = new Memory<byte>(new byte[4096]);
-            var numBytes = await stream.ReadAsync(buffer, LifetimeToken);
+            var numBytes = await stream.ReadAsync(buffer, LifetimeToken).ConfigureAwait(false);
             var result = buffer.Slice(0, numBytes);
             var message = Serializer.Deserialize<Message>(result);
             return message;

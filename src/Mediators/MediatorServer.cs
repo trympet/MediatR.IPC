@@ -38,7 +38,7 @@ namespace MediatR.IPC
                 response = e;
             }
 
-            await SendResponseAsync(request, response, responseStream);
+            await SendResponseAsync(request, response, responseStream).ConfigureAwait(false);
         }
 
         private async Task SendResponseAsync(Request request, object? response, Stream stream)
