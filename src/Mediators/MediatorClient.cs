@@ -73,7 +73,7 @@ namespace MediatR.IPC
                 return default(Unit);
             }
 
-            return DeserializeContent(response , contentType);
+            return DeserializeContent(response, contentType);
         }
     }
 }

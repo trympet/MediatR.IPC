@@ -1,8 +1,6 @@
 ﻿using MediatR.IPC.Messages;
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +11,7 @@ namespace MediatR.IPC
     /// </summary>
     public abstract class MediatorServerBase : IPCMediator, IDisposable
     {
-        private CancellationToken requestLifetimeToken;
+        private readonly CancellationToken requestLifetimeToken;
         protected MediatorServerBase(string pipeName) : base(pipeName) { }
 
         /// <summary>

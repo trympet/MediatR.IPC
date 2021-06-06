@@ -24,7 +24,7 @@ namespace MediatR
         protected IPCMediator(string pipeName)
         {
             this.pipeName = pipeName;
-            lock(finalizerLock)
+            lock (finalizerLock)
             {
                 if (!finalized)
                 {
