@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace MediatR.IPC
     public class MediatorClientPool : ISender
     {
         private readonly SemaphoreSlim poolSemaphore;
-        private readonly Stack<MediatorClient> clients;
+        private readonly ConcurrentStack<MediatorClient> clients;
         private readonly string poolName;
 
         public MediatorClientPool(string poolName, int poolSize)
@@ -19,12 +20,12 @@ namespace MediatR.IPC
             }
 
             poolSemaphore = new SemaphoreSlim(poolSize, poolSize);
-            clients = new Stack<MediatorClient>(poolSize);
+            clients = new ConcurrentStack<MediatorClient>();
             this.poolName = poolName;
             PopulatePool(clients, poolSize);
         }
 
-        private void PopulatePool(Stack<MediatorClient> pool, int poolSize)
+        private void PopulatePool(ConcurrentStack<MediatorClient> pool, int poolSize)
         {
             for (uint i = 0; i < poolSize; i++)
             {
@@ -35,7 +36,7 @@ namespace MediatR.IPC
         public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
             await poolSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-            var client = clients.Pop();
+            MediatorClient client = await PopClientAsync().ConfigureAwait(false);
             try
             {
                 return await client.Send(request, cancellationToken).ConfigureAwait(false);
@@ -50,7 +51,7 @@ namespace MediatR.IPC
         public async Task<object?> Send(object request, CancellationToken cancellationToken = default)
         {
             await poolSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-            var client = clients.Pop();
+            var client = await PopClientAsync().ConfigureAwait(false);
             try
             {
                 return await client.Send(request, cancellationToken).ConfigureAwait(false);
@@ -60,6 +61,17 @@ namespace MediatR.IPC
                 clients.Push(client);
                 poolSemaphore.Release();
             }
+        }
+
+        private async Task<MediatorClient> PopClientAsync()
+        {
+            MediatorClient client;
+            while (!clients.TryPop(out client))
+            {
+                await Task.Delay(1).ConfigureAwait(false);
+            }
+
+            return client;
         }
     }
 }
