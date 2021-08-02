@@ -20,7 +20,7 @@ namespace MediatR.IPC
         /// <summary>
         /// A stream provider which relies on Unix Domain Sockets. Only supported on Unix (obliviously).
         /// </summary>
-        public static readonly IStreamStratergy UnixDomainSocket = new UnixDomainSocketStratergy();
+        public static readonly IStreamStratergy<UnixDomainSocketOptions> UnixDomainSocket = new UnixDomainSocketStratergy();
 
         /// <summary>
         /// The default stream provider. Supported on all platforms.

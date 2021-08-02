@@ -14,6 +14,17 @@ namespace MediatR.IPC
     }
 
     /// <summary>
+    /// Represents a stream provider for IPC communication.
+    /// Consumed by <see cref="IPCMediator.UseTransport(IStreamStratergy)"/>
+    /// </summary>
+    public interface IStreamStratergy<TOptions> : IStreamStratergy
+    {
+        void WithOptions(TOptions options);
+    }
+
+
+
+    /// <summary>
     /// Specifies the type and direction of the stream.
     /// </summary>
     public enum StreamType

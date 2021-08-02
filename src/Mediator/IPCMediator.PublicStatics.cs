@@ -86,6 +86,13 @@ namespace MediatR
             streamStratergy = stratergy;
         }
 
+        public static IStreamStratergy<T> UseTransport<T>(IStreamStratergy<T> stratergy)
+        {
+            UseTransport((IStreamStratergy)stratergy);
+
+            return stratergy;
+        }
+
         private static void FinalizeUnfinalized()
         {
             var unfinalizedTypes = UnfinalizedRequests.SelectMany(r => r.Value);
