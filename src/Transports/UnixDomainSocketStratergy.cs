@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,6 +37,7 @@ namespace MediatR.IPC
                 if (type == StreamType.ClientStream)
                 {
                     var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+                    token.Register(() => { socket.Close(); });
                     await Connect(streamName, socket).ConfigureAwait(false);
                     return new NetworkStream(socket, FileAccess.ReadWrite, true);
                 }
@@ -49,13 +51,34 @@ namespace MediatR.IPC
                     var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
                     socket.Bind(new UnixDomainSocketEndPoint(streamName));
                     socket.Listen(1);
-                    Socket connectedSocket;
+                    Socket? connectedSocket = null;
 #if NET6_0_OR_GREATER
                     connectedSocket = await socket.AcceptAsync(token).ConfigureAwait(false);
 #else
-                    var socketTask = socket.AcceptAsync();
-                    token.Register(() => { socket.Close(); socket.Dispose(); });
-                    connectedSocket = await socketTask.ConfigureAwait(false);
+                    var disposed = false;
+                    var acceptTask = socket.AcceptAsync();
+                    token.Register(() =>
+                    {
+                        if (!disposed)
+                        {
+                            // Interrupts acceptTask; it does not take cancellationtoken.
+                            socket.Close();
+                        }
+                    });
+                    try
+                    {
+                        connectedSocket = await acceptTask.ConfigureAwait(false);
+                    }
+                    catch (SocketException e)
+                    {
+                        if (!token.IsCancellationRequested) throw;
+                        throw new OperationCanceledException("Socket accept was cancelled.", e);
+                    }
+                    finally
+                    {
+                        disposed = true;
+                        socket.Dispose();
+                    }
 #endif
                     return new NetworkStream(connectedSocket, FileAccess.ReadWrite, true);
                 }
