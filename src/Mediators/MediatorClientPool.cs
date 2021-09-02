@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace MediatR.IPC
 {
-    public class MediatorClientPool : ISender
+    public class MediatorClientPool : ISender, IDisposable
     {
         private readonly SemaphoreSlim poolSemaphore;
+        private readonly List<MediatorClient> allClients;
         private readonly ConcurrentStack<MediatorClient> clients;
         private readonly string poolName;
 
@@ -23,6 +24,7 @@ namespace MediatR.IPC
             clients = new ConcurrentStack<MediatorClient>();
             this.poolName = poolName;
             PopulatePool(clients, poolSize);
+            allClients = new List<MediatorClient>(clients);
         }
 
         private void PopulatePool(ConcurrentStack<MediatorClient> pool, int poolSize)
@@ -60,6 +62,14 @@ namespace MediatR.IPC
             {
                 clients.Push(client);
                 poolSemaphore.Release();
+            }
+        }
+
+        public void Dispose()
+        {
+            foreach (var client in allClients)
+            {
+                client.Dispose();
             }
         }
 
