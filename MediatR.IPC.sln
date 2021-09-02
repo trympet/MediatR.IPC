@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31129.286
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.IPC", "src\MediatR.IPC.csproj", "{0C5D58F3-5B41-42ED-B832-E9C08EE63978}"
 EndProject
@@ -11,9 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.IPC.Samples.AspNet"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{1418A4CC-51C8-49C9-B734-18CFA95D8007}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediatR.IPC.Samples.Common", "samples\MediatR.IPC.Samples.Common\MediatR.IPC.Samples.Common.csproj", "{FECB7ED3-0B6A-4F27-9159-55DD97BC3456}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.IPC.Samples.Common", "samples\MediatR.IPC.Samples.Common\MediatR.IPC.Samples.Common.csproj", "{FECB7ED3-0B6A-4F27-9159-55DD97BC3456}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediatR.IPC.Samples.AssemblyScan", "samples\MediatR.IPC.Samples.AssemblyScan\MediatR.IPC.Samples.AssemblyScan.csproj", "{2519F133-C69C-47A3-929E-6ED4CF122D11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.IPC.Samples.AssemblyScan", "samples\MediatR.IPC.Samples.AssemblyScan\MediatR.IPC.Samples.AssemblyScan.csproj", "{2519F133-C69C-47A3-929E-6ED4CF122D11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediatR.IPC.Tests", "MediatR.IPC.Tests\MediatR.IPC.Tests\MediatR.IPC.Tests.csproj", "{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{2519F133-C69C-47A3-929E-6ED4CF122D11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2519F133-C69C-47A3-929E-6ED4CF122D11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2519F133-C69C-47A3-929E-6ED4CF122D11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
