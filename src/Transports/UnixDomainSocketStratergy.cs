@@ -49,7 +49,14 @@ namespace MediatR.IPC
                     var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
                     socket.Bind(new UnixDomainSocketEndPoint(streamName));
                     socket.Listen(1);
-                    var connectedSocket = await socket.AcceptAsync().ConfigureAwait(false);
+                    Socket connectedSocket;
+#if NET6_0_OR_GREATER
+                    connectedSocket = await socket.AcceptAsync(token).ConfigureAwait(false);
+#else
+                    var socketTask = socket.AcceptAsync();
+                    token.Register(() => { socket.Close(); socket.Dispose(); });
+                    connectedSocket = await socketTask.ConfigureAwait(false);
+#endif
                     return new NetworkStream(connectedSocket, FileAccess.ReadWrite, true);
                 }
             }
