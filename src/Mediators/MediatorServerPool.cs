@@ -13,6 +13,7 @@ namespace MediatR.IPC
         private readonly ISender sender;
         private readonly string poolName;
         private readonly List<MediatorServer> servers = new();
+        private bool disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediatorServerPool"/> class.
@@ -38,6 +39,11 @@ namespace MediatR.IPC
         /// <returns></returns>
         public Task Run()
         {
+            if (disposedValue)
+            {
+                throw new ObjectDisposedException(nameof(MediatorServerPool));
+            }
+
             return Task.WhenAll(servers.Select(s => s.Run()));
         }
 
@@ -46,9 +52,23 @@ namespace MediatR.IPC
         /// </summary>
         public void Dispose()
         {
-            foreach (var server in servers)
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
             {
-                server.Dispose();
+                if (disposing)
+                {
+                    foreach (var server in servers)
+                    {
+                        server.Dispose();
+                    }
+                }
+
+                disposedValue = true;
             }
         }
 
