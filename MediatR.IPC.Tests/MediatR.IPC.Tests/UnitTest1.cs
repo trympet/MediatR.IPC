@@ -15,7 +15,7 @@ namespace MediatR.IPC.Tests
         public Mock<ISender> Sender { get; set; }
     }
 
-    [TestFixture, TestFixtureSource(nameof(Tests.PoolSizes))]
+    [TestFixture, TestFixtureSource(nameof(PoolSizes))]
     public class Tests : TestBase
     {
         static int[] PoolSizes = new[] { 1, 2, 8 };
@@ -45,9 +45,9 @@ namespace MediatR.IPC.Tests
             cts = new CancellationTokenSource();
             Sender = new Mock<ISender>();
 
-            SetupRequest<VoidRequest, Unit>(Unit.Value);
-            SetupRequest<RequestWithResponse, Response>((a, _) => new Response { A = a.A, B = a.B, C = a.C });
-            SetupRequest<SlowRequest, Response>(async () =>
+            this.SetupRequest<VoidRequest, Unit>(Unit.Value);
+            this.SetupRequest<RequestWithResponse, Response>((a, _) => new Response { A = a.A, B = a.B, C = a.C });
+            this.SetupRequest<SlowRequest, Response>(async () =>
             {
                 await Task.Delay(500);
                 return new Response();
@@ -84,7 +84,7 @@ namespace MediatR.IPC.Tests
                 Assert.DoesNotThrowAsync(() => clientPool.Send(new VoidRequest()));
             }
 
-            VerifyRequest<VoidRequest>(Times.Exactly(ParallellCount));
+            this.VerifyRequest<VoidRequest>(Times.Exactly(ParallellCount));
         }
 
         [Test]
@@ -112,13 +112,13 @@ namespace MediatR.IPC.Tests
             Assert.AreEqual(request4.A, response4.A);
             Assert.AreEqual(request4.B, response4.B);
             Assert.AreEqual(request4.C, response4.C);
-            VerifyRequest<RequestWithResponse>(Times.Exactly(4));
+            this.VerifyRequest<RequestWithResponse>(Times.Exactly(4));
         }
 
         [Test]
         public void Send_VoidRequestsInParallell_DoesNotThrow()
         {
-            RunInParallell(ParallellCount, async () =>
+            this.RunInParallell(ParallellCount, async () =>
             {
                 try
                 {
@@ -130,26 +130,26 @@ namespace MediatR.IPC.Tests
                 }
             });
 
-            VerifyRequest<VoidRequest>(Times.Exactly(ParallellCount));
+            this.VerifyRequest<VoidRequest>(Times.Exactly(ParallellCount));
         }
 
         [Test]
         public void Send_ResponseRequestsInParallell_DoesNotThrow()
         {
-            RunInParallell(ParallellCount, async () =>
+            this.RunInParallell(ParallellCount, async () =>
             {
                 await clientPool.Send(new RequestWithResponse());
             });
 
-            VerifyRequest<RequestWithResponse>(Times.Exactly(ParallellCount));
+            this.VerifyRequest<RequestWithResponse>(Times.Exactly(ParallellCount));
         }
 
         [Test]
         public void Send_SlowRequestsInParallell_DoesNotThrow()
         {
-            RunInParallell(ParallellCount, () => clientPool.Send(new SlowRequest()));
+            this.RunInParallell(ParallellCount, () => clientPool.Send(new SlowRequest()));
 
-            VerifyRequest<SlowRequest>(Times.Exactly(ParallellCount));
+            this.VerifyRequest<SlowRequest>(Times.Exactly(ParallellCount));
         }
 
         [Test]
@@ -206,75 +206,6 @@ namespace MediatR.IPC.Tests
             AsyncTestDelegate task = () => clientPool.Send(new VoidRequest());
 
             Assert.DoesNotThrowAsync(task);
-        }
-
-        private void SetupRequest<TRequest, TResponse>(TResponse response)
-            where TRequest : IRequest<TResponse>
-        {
-            Sender.Setup(s => s.Send<TResponse>(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
-
-            Sender.Setup(s => s.Send(It.Is<object>(o => o is TRequest), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult((object)response));
-        }
-
-        private void SetupRequest<TRequest, TResponse>(Func<TRequest, CancellationToken, TResponse> response)
-            where TRequest : IRequest<TResponse>
-        {
-            Sender.Setup(s => s.Send<TResponse>(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(response);
-
-            Sender.Setup(s => s.Send(It.Is<object>(o => o is TRequest), It.IsAny<CancellationToken>()))
-                .Returns<TRequest, CancellationToken>((a, b) => Task.FromResult((object)response(a, b)));
-        }
-
-        private void SetupRequest<TRequest, TResponse>(Func<Task<TResponse>> response)
-            where TRequest : IRequest<TResponse>
-        {
-            Sender.Setup(s => s.Send<TResponse>(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
-                .Returns(response);
-
-            Func<Task<object>> res = async () => await response();
-            Sender.Setup(s => s.Send(It.Is<object>(o => o is TRequest), It.IsAny<CancellationToken>()))
-                .Returns(res);
-        }
-
-        private void VerifyRequest<TRequest>(Times times)
-        {
-            Sender.Verify(s => s.Send(It.Is<object>(o => o is TRequest), It.IsAny<CancellationToken>()), times);
-        }
-
-        private void RunInParallell(int threadCount, Func<Task> func)
-        {
-            var threads = new List<Thread>(threadCount);
-            var exceptions = new List<Exception>();
-            for (int i = 0; i < threadCount; i++)
-            {
-                var t = new Thread(() =>
-                {
-                    try
-                    {
-                        func().GetAwaiter().GetResult();
-                    }
-                    catch (Exception e)
-                    {
-                        exceptions.Add(e);
-                    }
-                });
-
-                t.Start();
-                threads.Add(t);
-            }
-
-            foreach (var thread in threads)
-            {
-                thread.Join();
-            }
-
-            if (exceptions.Any())
-            {
-                Assert.Fail("One or more exceptions occured while executing in parallell.", string.Join('\n', exceptions.Select(e => e.Message)));
-            }
         }
     }
 }
