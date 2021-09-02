@@ -51,7 +51,7 @@ namespace MediatR.IPC
 
         private async Task<Message> SendImpl<T>(T request, CancellationToken cancellationToken) where T : notnull
         {
-            using var pipe = await CreateAndRegisterStreamAsync(StreamType.ClientStream, cancellationToken).ConfigureAwait(false);
+            await using var pipe = await CreateAndRegisterStreamAsync(StreamType.ClientStream, cancellationToken).ConfigureAwait(false);
             await SendMessageAsync(request, pipe).ConfigureAwait(false);
             var deserialized = Serializer.Deserialize<Message>(pipe);
             cancellationToken.ThrowIfCancellationRequested();

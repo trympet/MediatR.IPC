@@ -41,7 +41,7 @@ namespace MediatR.IPC
         {
             while (!LifetimeToken.IsCancellationRequested)
             {
-                using var stream = await CreateAndRegisterStreamAsync(StreamType.ServerStream).ConfigureAwait(false);
+                await using var stream = await CreateAndRegisterStreamAsync(StreamType.ServerStream).ConfigureAwait(false);
                 var message = await DeserializeRequest(stream).ConfigureAwait(false);
 
                 var request = FindRequest(message)
