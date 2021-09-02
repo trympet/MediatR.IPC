@@ -172,7 +172,7 @@ namespace MediatR.IPC.Tests
                 finish++;
             });
 
-            while(finish < ParallellCount)
+            while(finish < ParallellCount && !exceptions.Any())
             {
                 await Task.Delay(5);
             }
