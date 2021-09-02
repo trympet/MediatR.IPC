@@ -58,6 +58,7 @@ namespace MediatR.IPC
                 responseMessage = new Message(request.Name, responseSerialized);
             }
             Serializer.Serialize(stream, responseMessage);
+            await stream.FlushAsync().ConfigureAwait(false);
         }
     }
 }
