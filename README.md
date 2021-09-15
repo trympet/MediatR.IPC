@@ -60,7 +60,12 @@ All requests sent to the client need to be registered on the client and the serv
 ## Transports
 There are two supported transport types: Named Pipes and Unix Domain Sockets. Transport is specified with
 ```csharp
-IPCMediator.UseTransport(IStreamStratergy);
+IPCMediator.UseTransport(IPCTransport.UnixDomainSocket)
+    .WithOptions(new UnixDomainSocketOptions
+    {
+        SocketPrefix = "/tmp/",
+        SocketSuffix = ".sock",
+    });
 ```
 You could also implement your own transport; a TCP transport for instance.
 
