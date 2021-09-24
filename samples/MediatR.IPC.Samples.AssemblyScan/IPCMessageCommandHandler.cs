@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MediatR.IPC.Samples.AssemblyScan
 {
-    internal class IPCMessageCommandHandler : IRequestHandler<IPCMessageCommand, bool>
+    public class IPCMessageCommandHandler : IRequestHandler<IPCMessageCommand, bool>
     {
         private static readonly Random Random = new Random();
 

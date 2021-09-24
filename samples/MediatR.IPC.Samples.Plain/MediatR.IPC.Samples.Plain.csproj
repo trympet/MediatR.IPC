@@ -5,4 +5,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MediatR.IPC.Samples.Common\MediatR.IPC.Samples.Common.csproj" />
+  </ItemGroup>
+
 </Project>
