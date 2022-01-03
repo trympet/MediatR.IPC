@@ -82,6 +82,6 @@ Currently, exceptions thrown by request handlers are not serialized, and no type
 All forms of contribution are welcome! Here is a list of some much needed features.
 
 - [x] Request cancellation with `CancellationToken`
-- [ ] Dynamic buffers for requests in `MediatorServerBase`
+- [x] Dynamic buffers for requests in `MediatorServerBase`
 - [ ] `IPublisher` implementation
 - [ ]  Routing of `INotification` to `INotificationHandler` designated for IPC via DI container.
