@@ -42,8 +42,7 @@ namespace MediatR.IPC
             while (!LifetimeToken.IsCancellationRequested)
             {
                 await using var stream = await CreateAndRegisterStreamAsync(StreamType.ServerStream).ConfigureAwait(false);
-                var message = await DeserializeRequest(stream).ConfigureAwait(false);
-
+                var message = await Message.Deserialize(stream, LifetimeToken).ConfigureAwait(false);
                 var request = FindRequest(message)
                     ?? throw new InvalidOperationException($"Request not recognized: {message.Name}");
 
@@ -69,15 +68,6 @@ namespace MediatR.IPC
                 // Regardless, we need to cancel the other task.
                 cts.Cancel();
             }
-        }
-
-        private async Task<Message> DeserializeRequest(Stream stream)
-        {
-            var buffer = new Memory<byte>(new byte[4096]);
-            var numBytes = await stream.ReadAsync(buffer, LifetimeToken).ConfigureAwait(false);
-            var result = buffer.Slice(0, numBytes);
-            var message = Serializer.Deserialize<Message>(result);
-            return message;
         }
 
         private static Task<int> GetStreamEofTask(Stream responseStream, CancellationToken requestToken)

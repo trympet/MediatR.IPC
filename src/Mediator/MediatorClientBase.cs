@@ -22,9 +22,9 @@ namespace MediatR.IPC
         protected async Task SendMessageAsync<TMessage>(TMessage message, Stream stream)
             where TMessage : notnull
         {
-            var requestSerialized = await SerializeRequestAsync(message).ConfigureAwait(false);
+            var requestSerialized = await SerializeContentAsync(message).ConfigureAwait(false);
             var request = new Message(message.GetType().FullName ?? "UNKNOWN", requestSerialized);
-            Serializer.Serialize(stream, request);
+            request.Serialize(stream);
             await stream.FlushAsync().ConfigureAwait(false);
         }
     }

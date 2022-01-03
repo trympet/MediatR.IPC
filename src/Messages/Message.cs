@@ -1,12 +1,19 @@
 ﻿using ProtoBuf;
+using ProtoBuf.Meta;
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MediatR.IPC.Messages
 {
     [ProtoContract]
     internal class Message
     {
+        private const int LengthPrefixFieldNumber = 10;
+
         /// <summary>
         /// Instantiates a new instance of a Message with a binary content.
         /// </summary>
@@ -33,6 +40,9 @@ namespace MediatR.IPC.Messages
             Name = "NULL";
         }
 
+        private static RuntimeTypeModel TypeModel => IPCMediator.Serializer;
+
+
         [ProtoMember(1)]
         public string Name { get; set; } = string.Empty;
 
@@ -49,5 +59,64 @@ namespace MediatR.IPC.Messages
         public string? ErrorMessage { get; private set; }
 
         public bool IsNullResponse => !Content.Any() && Name == "NULL";
+
+        public static async Task<Message> Deserialize(Stream stream, CancellationToken cancellationToken)
+        {
+            // TypeModel.DeserializeWithLengthPrefix does not work. We'll do it ourselves.
+            const int BufferCapacity = 256; // This is arbitrary.
+            var bufferWriter = new System.Buffers.ArrayBufferWriter<byte>();
+            var expectedLength = await GetMessageLength(stream, cancellationToken).ConfigureAwait(false);
+            while (bufferWriter.WrittenCount < expectedLength)
+            {
+                var buffer = bufferWriter.GetMemory(BufferCapacity);
+                var byteCount = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+                bufferWriter.Advance(byteCount);
+            }
+
+            Debug.Assert(bufferWriter.WrittenCount == expectedLength, $"Expected {expectedLength}, but got {bufferWriter.WrittenCount}");
+            return TypeModel.Deserialize<Message>(bufferWriter.WrittenMemory);
+        }
+
+        public void Serialize(Stream stream)
+        {
+            TypeModel.SerializeWithLengthPrefix(stream, this, typeof(Message), ProtoBuf.PrefixStyle.Base128, LengthPrefixFieldNumber);
+        }
+
+        private static async Task<uint> GetMessageLength(Stream stream, CancellationToken cancellationToken)
+        {
+            const uint msbMask = 0x7F;
+            var buffer = new byte[1];
+            int offset = 0;
+            bool isMsbSet = true;
+            uint sum = 0;
+
+            await ProcessFieldPrefix(stream, buffer, cancellationToken).ConfigureAwait(false);
+
+            while (isMsbSet)
+            {
+                var shift = offset;
+                offset += await stream.ReadAsync(buffer, 0, 1, cancellationToken).ConfigureAwait(false);
+                var part = buffer[0];
+                isMsbSet = part >> 7 == 0x1; // varint is described here: https://developers.google.com/protocol-buffers/docs/encoding
+                sum |= (part & msbMask) << (shift * 7);
+            }
+
+            return sum;
+        }
+
+        private static async Task ProcessFieldPrefix(Stream stream, byte[] buffer, CancellationToken cancellationToken)
+        {
+            const int varintWireType = 2;
+            const int fieldTypeShift = 3;
+            // This serves no purpose; first byte could be discarded.
+            int bytesRead = 0;
+            while (bytesRead == 0)
+            {
+                bytesRead = await stream.ReadAsync(buffer, 0, 1, cancellationToken).ConfigureAwait(false);
+                Console.WriteLine("a");
+            }
+
+            Debug.Assert((buffer[0] & 0x07) == varintWireType && ((buffer[0] >> fieldTypeShift) == LengthPrefixFieldNumber));
+        }
     }
 }

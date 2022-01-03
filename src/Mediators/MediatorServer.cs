@@ -54,10 +54,10 @@ namespace MediatR.IPC
             }
             else
             {
-                var responseSerialized = await SerializeRequestAsync(response).ConfigureAwait(false);
+                var responseSerialized = await SerializeContentAsync(response).ConfigureAwait(false);
                 responseMessage = new Message(request.Name, responseSerialized);
             }
-            Serializer.Serialize(stream, responseMessage);
+            responseMessage.Serialize(stream);
             await stream.FlushAsync().ConfigureAwait(false);
         }
     }

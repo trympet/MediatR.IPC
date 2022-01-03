@@ -52,6 +52,7 @@ namespace MediatR.IPC.Tests
                 await Task.Delay(500);
                 return new Response();
             });
+            this.SetupRequest<HugeRequest, byte[]>((req, _) => (byte[])req.Data.Clone());
 
             Sender.Setup(s => s.Send(It.IsAny<IRequest>(), It.Is<CancellationToken>(t => t.IsCancellationRequested)))
                 .ThrowsAsync(new TaskCanceledException());
@@ -172,7 +173,7 @@ namespace MediatR.IPC.Tests
                 finish++;
             });
 
-            while(finish < ParallellCount && !exceptions.Any())
+            while (finish < ParallellCount && !exceptions.Any())
             {
                 await Task.Delay(5);
             }
@@ -206,6 +207,32 @@ namespace MediatR.IPC.Tests
             AsyncTestDelegate task = () => clientPool.Send(new VoidRequest());
 
             Assert.DoesNotThrowAsync(task);
+        }
+
+        [Test]
+        public async Task Send_HugeRequest_DoesNotThrow()
+        {
+            var request1 = HugeRequest.Create(1_000_000);
+            var request2 = HugeRequest.Create(2_000_000);
+            var request3 = HugeRequest.Create(3_000_000);
+            var request4 = HugeRequest.Create(10_000_000);
+
+            var responseTask1 = clientPool.Send(request1);
+            var responseTask2 = clientPool.Send(request2);
+            var responseTask3 = clientPool.Send(request3);
+            var responseTask4 = clientPool.Send(request4);
+
+            var res = await Task.WhenAll(responseTask1, responseTask2, responseTask3, responseTask4);
+            var response1 = res[0];
+            var response2 = res[1];
+            var response3 = res[2];
+            var response4 = res[3];
+
+            Assert.IsTrue(request1.Data.SequenceEqual(response1));
+            Assert.IsTrue(request2.Data.SequenceEqual(response2));
+            Assert.IsTrue(request3.Data.SequenceEqual(response3));
+            Assert.IsTrue(request4.Data.SequenceEqual(response4));
+            this.VerifyRequest<HugeRequest>(Times.Exactly(4));
         }
     }
 }

@@ -53,9 +53,9 @@ namespace MediatR.IPC
         {
             await using var pipe = await CreateAndRegisterStreamAsync(StreamType.ClientStream, cancellationToken).ConfigureAwait(false);
             await SendMessageAsync(request, pipe).ConfigureAwait(false);
-            var deserialized = Serializer.Deserialize<Message>(pipe);
+            var message = await Message.Deserialize(pipe, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
-            return deserialized;
+            return message;
         }
 
         private TResponse DeserializeResponse<TResponse>(Message response)

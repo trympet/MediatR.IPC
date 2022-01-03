@@ -14,9 +14,9 @@ namespace MediatR
         private static readonly Type RequestType = typeof(IRequest<>);
         private static readonly Type UnitType = typeof(Unit);
 
-        private protected static readonly HashSet<Request> Requests = new HashSet<Request>();
+        internal static readonly HashSet<Request> Requests = new HashSet<Request>();
 
-        private protected static readonly RuntimeTypeModel Serializer = InitializeRuntimeTypeModel();
+        internal static readonly RuntimeTypeModel Serializer = InitializeRuntimeTypeModel();
 
         private static readonly List<IPCBuilderContext<IEnumerable<Type>>> UnfinalizedRequests
             = new List<IPCBuilderContext<IEnumerable<Type>>>();

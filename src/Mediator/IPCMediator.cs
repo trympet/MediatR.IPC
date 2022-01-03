@@ -62,12 +62,12 @@ namespace MediatR
             }
         }
 
-        protected static Task<byte[]> SerializeRequestAsync<TRequest>(TRequest request)
+        protected static Task<byte[]> SerializeContentAsync<TRequest>(TRequest request)
         {
-            return SerializeRequestAsync((object?)request);
+            return SerializeContentAsync((object?)request);
         }
 
-        protected static async Task<byte[]> SerializeRequestAsync(object? request)
+        protected static async Task<byte[]> SerializeContentAsync(object? request)
         {
             using var serializationStream = new MemoryStream();
             Serializer.Serialize(serializationStream, request);
