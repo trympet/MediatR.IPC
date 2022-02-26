@@ -85,18 +85,19 @@ namespace MediatR.IPC.Messages
         private static async Task<uint> GetMessageLength(Stream stream, CancellationToken cancellationToken)
         {
             const uint msbMask = 0x7F;
-            var buffer = new byte[1];
+            Memory<byte> buffer = new byte[1];
             int offset = 0;
             bool isMsbSet = true;
             uint sum = 0;
 
             await ProcessFieldPrefix(stream, buffer, cancellationToken).ConfigureAwait(false);
 
+            byte part;
             while (isMsbSet)
             {
                 var shift = offset;
-                offset += await stream.ReadAsync(buffer, 0, 1, cancellationToken).ConfigureAwait(false);
-                var part = buffer[0];
+                offset += await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+                part = buffer.Span[0];
                 isMsbSet = part >> 7 == 0x1; // varint is described here: https://developers.google.com/protocol-buffers/docs/encoding
                 sum |= (part & msbMask) << (shift * 7);
             }
@@ -104,17 +105,17 @@ namespace MediatR.IPC.Messages
             return sum;
         }
 
-        private static async Task ProcessFieldPrefix(Stream stream, byte[] buffer, CancellationToken cancellationToken)
+        private static async Task ProcessFieldPrefix(Stream stream, Memory<byte> buffer, CancellationToken cancellationToken)
         {
             const int varintWireType = 2;
             const int fieldTypeShift = 3;
-            var bytesRead = await stream.ReadAsync(buffer, 0, 1, cancellationToken).ConfigureAwait(false);
+            var bytesRead = await stream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             if (bytesRead == 0)
             {
                 throw new TaskCanceledException("End of stream has been reached.");
             }
 
-            Debug.Assert((buffer[0] & 0x07) == varintWireType && ((buffer[0] >> fieldTypeShift) == LengthPrefixFieldNumber));
+            Debug.Assert((buffer.Span[0] & 0x07) == varintWireType && ((buffer.Span[0] >> fieldTypeShift) == LengthPrefixFieldNumber));
         }
     }
 }
