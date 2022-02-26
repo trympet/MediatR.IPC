@@ -1,6 +1,7 @@
 ﻿using MediatR.IPC.Exceptions;
 using MediatR.IPC.Messages;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,17 +12,35 @@ namespace MediatR.IPC
     /// </summary>
     public class MediatorClient : MediatorClientBase, ISender
     {
-        private readonly SemaphoreSlim pipeSemaphore = new(1, 1);
+        private readonly SemaphoreSlim? pipeSemaphore;
 
         public MediatorClient(string name, uint id)
-            : base($"{name}{(char)(id + 65)}") { }
+            : this(name, id, true) { }
+
+        internal MediatorClient(string name, uint id, bool threadSafe)
+            : base($"{name}{(char)(id + 65)}")
+        {
+            ThreadSafe = threadSafe;
+            if (threadSafe)
+            {
+                pipeSemaphore = new SemaphoreSlim(1, 1);
+            }
+        }
+
+#if NET5_0_OR_GREATER
+        [MemberNotNullWhen(true, nameof(pipeSemaphore))]
+#endif
+        private bool ThreadSafe { get; }
 
         /// <inheritdoc/>
         /// <exception cref="IPCException">Thrown when the server sends back an exception.</exception>
         /// <exception cref="TaskCanceledException">Thrown if cancellation is requested.</exception>
         public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
-            await pipeSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+            if (ThreadSafe)
+            {
+                await pipeSemaphore!.WaitAsync(cancellationToken).ConfigureAwait(false);
+            }
             try
             {
                 var response = await SendImpl(request, cancellationToken).ConfigureAwait(false);
@@ -29,14 +48,20 @@ namespace MediatR.IPC
             }
             finally
             {
-                pipeSemaphore.Release();
+                if (ThreadSafe)
+                {
+                    pipeSemaphore!.Release();
+                }
             }
         }
 
         /// <inheritdoc/>
         public async Task<object?> Send(object request, CancellationToken cancellationToken = default)
         {
-            await pipeSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+            if (ThreadSafe)
+            {
+                await pipeSemaphore!.WaitAsync(cancellationToken).ConfigureAwait(false);
+            }
             try
             {
                 var response = await SendImpl(request, cancellationToken).ConfigureAwait(false);
@@ -45,7 +70,10 @@ namespace MediatR.IPC
             }
             finally
             {
-                pipeSemaphore.Release();
+                if (ThreadSafe)
+                {
+                    pipeSemaphore!.Release();
+                }
             }
         }
 

@@ -10,7 +10,7 @@ namespace MediatR.IPC
     {
         private readonly SemaphoreSlim poolSemaphore;
         private readonly List<MediatorClient> allClients;
-        private readonly ConcurrentStack<MediatorClient> clients;
+        private readonly Stack<MediatorClient> availableClients;
         private readonly string poolName;
 
         public MediatorClientPool(string poolName, int poolSize)
@@ -21,31 +21,39 @@ namespace MediatR.IPC
             }
 
             poolSemaphore = new SemaphoreSlim(poolSize, poolSize);
-            clients = new ConcurrentStack<MediatorClient>();
+            availableClients = new Stack<MediatorClient>();
             this.poolName = poolName;
-            PopulatePool(clients, poolSize);
-            allClients = new List<MediatorClient>(clients);
+            PopulatePool(availableClients, poolSize);
+            allClients = new List<MediatorClient>(availableClients);
         }
 
-        private void PopulatePool(ConcurrentStack<MediatorClient> pool, int poolSize)
+        private void PopulatePool(Stack<MediatorClient> pool, int poolSize)
         {
             for (uint i = 0; i < poolSize; i++)
             {
-                pool.Push(new MediatorClient(poolName, i));
+                pool.Push(new MediatorClient(poolName, i, false));
             }
         }
 
         public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
             await poolSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-            MediatorClient client = await PopClientAsync().ConfigureAwait(false);
+            MediatorClient client;
+            lock (availableClients)
+            {
+                client = availableClients.Pop();
+            }
+
             try
             {
                 return await client.Send(request, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
-                clients.Push(client);
+                lock (availableClients)
+                {
+                    availableClients.Push(client);
+                }
                 poolSemaphore.Release();
             }
         }
@@ -53,14 +61,22 @@ namespace MediatR.IPC
         public async Task<object?> Send(object request, CancellationToken cancellationToken = default)
         {
             await poolSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-            var client = await PopClientAsync().ConfigureAwait(false);
+            MediatorClient client;
+            lock (availableClients)
+            {
+                client = availableClients.Pop();
+            }
+
             try
             {
                 return await client.Send(request, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
-                clients.Push(client);
+                lock (availableClients)
+                {
+                    availableClients.Push(client);
+                }
                 poolSemaphore.Release();
             }
         }
@@ -71,17 +87,7 @@ namespace MediatR.IPC
             {
                 client.Dispose();
             }
-        }
-
-        private async Task<MediatorClient> PopClientAsync()
-        {
-            MediatorClient client;
-            while (!clients.TryPop(out client))
-            {
-                await Task.Delay(1).ConfigureAwait(false);
-            }
-
-            return client;
+            poolSemaphore.Dispose();
         }
     }
 }
