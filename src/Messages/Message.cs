@@ -108,12 +108,10 @@ namespace MediatR.IPC.Messages
         {
             const int varintWireType = 2;
             const int fieldTypeShift = 3;
-            // This serves no purpose; first byte could be discarded.
-            int bytesRead = 0;
-            while (bytesRead == 0)
+            var bytesRead = await stream.ReadAsync(buffer, 0, 1, cancellationToken).ConfigureAwait(false);
+            if (bytesRead == 0)
             {
-                bytesRead = await stream.ReadAsync(buffer, 0, 1, cancellationToken).ConfigureAwait(false);
-                Console.WriteLine("a");
+                throw new TaskCanceledException("End of stream has been reached.");
             }
 
             Debug.Assert((buffer[0] & 0x07) == varintWireType && ((buffer[0] >> fieldTypeShift) == LengthPrefixFieldNumber));
