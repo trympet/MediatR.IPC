@@ -15,7 +15,7 @@ namespace MediatR.IPC
         public static readonly IStreamStratergy NamedPipe = new NamedPipeStratergy();
 
 #if !NETSTANDARD
-        [System.Runtime.Versioning.SupportedOSPlatform("Unix")]
+        [System.Runtime.Versioning.UnsupportedOSPlatform("windows")]
 #endif
         /// <summary>
         /// A stream provider which relies on Unix Domain Sockets. Only supported on Unix (obliviously).
