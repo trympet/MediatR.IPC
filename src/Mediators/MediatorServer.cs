@@ -41,7 +41,7 @@ namespace MediatR.IPC
             await SendResponseAsync(request, response, responseStream).ConfigureAwait(false);
         }
 
-        private async Task SendResponseAsync(Request request, object? response, Stream stream)
+        private static async Task SendResponseAsync(Request request, object? response, Stream stream)
         {
             Message responseMessage;
             if (response is Exception e)

@@ -19,7 +19,7 @@ namespace MediatR.IPC
         /// <param name="message">The message.</param>
         /// <param name="stream">The stream to send the message over.</param>
         /// <returns></returns>
-        protected async Task SendMessageAsync<TMessage>(TMessage message, Stream stream)
+        protected static async Task SendMessageAsync<TMessage>(TMessage message, Stream stream)
             where TMessage : notnull
         {
             var requestSerialized = await SerializeContentAsync(message).ConfigureAwait(false);

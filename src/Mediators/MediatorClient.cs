@@ -89,7 +89,7 @@ namespace MediatR.IPC
         private TResponse DeserializeResponse<TResponse>(Message response)
             => (TResponse)DeserializeResponse(response, typeof(TResponse));
 
-        private object DeserializeResponse(Message response, Type contentType)
+        private static object DeserializeResponse(Message response, Type contentType)
         {
             if (response.HasError)
             {

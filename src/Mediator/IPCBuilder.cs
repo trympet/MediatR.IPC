@@ -14,8 +14,6 @@ namespace MediatR
 
     public class IPCBuilder<TRegistration, TContext>
     {
-        private static readonly Type UnitType = typeof(Unit);
-
         internal IPCBuilder(TContext context)
         {
             BuilderContext = new IPCBuilderContext<TContext>(context);
