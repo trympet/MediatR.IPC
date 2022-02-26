@@ -11,7 +11,6 @@ namespace MediatR.IPC
     /// </summary>
     public abstract class MediatorServerBase : IPCMediator, IDisposable
     {
-        private readonly CancellationToken requestLifetimeToken;
         protected MediatorServerBase(string pipeName) : base(pipeName) { }
 
         /// <summary>
@@ -59,9 +58,17 @@ namespace MediatR.IPC
             {
                 var completionSource = ProcessMessage(request, message, responseStream, requestToken);
                 var cancellationSource = GetStreamEofTask(responseStream, requestToken);
-                await Task.WhenAny(completionSource, cancellationSource).ConfigureAwait(false);
+                var result = await Task.WhenAny(completionSource, cancellationSource).ConfigureAwait(false);
+                if (result == cancellationSource)
+                {
+                    await completionSource.ConfigureAwait(false);
+                }
             }
             catch (OperationCanceledException) { }
+            catch (IOException)
+            {
+                // Broken socket.
+            }
             finally
             {
                 // Either an EOF is received or the request is complete.
