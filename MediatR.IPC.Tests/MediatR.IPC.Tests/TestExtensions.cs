@@ -48,34 +48,23 @@ namespace MediatR.IPC.Tests
 
         public static void RunInParallell(this TestBase source, int threadCount, Func<Task> func)
         {
-            var threads = new List<Thread>(threadCount);
             var exceptions = new List<Exception>();
-            for (int i = 0; i < threadCount; i++)
+            Parallel.ForEachAsync(Enumerable.Range(0, threadCount), async (_, _) =>
             {
-                var t = new Thread(() =>
+                try
                 {
-                    try
-                    {
-                        func().GetAwaiter().GetResult();
-                    }
-                    catch (Exception e)
-                    {
-                        exceptions.Add(e);
-                    }
-                });
+                    await func();
+                }
+                catch (Exception e)
+                {
+                    exceptions.Add(e);
+                }
 
-                t.Start();
-                threads.Add(t);
-            }
-
-            foreach (var thread in threads)
-            {
-                thread.Join();
-            }
+            }).GetAwaiter().GetResult();
 
             if (exceptions.Any())
             {
-                Assert.Fail("One or more exceptions occured while executing in parallell.", string.Join('\n', exceptions.Select(e => e.Message)));
+                Assert.Fail($"One or more exceptions occured while executing in parallell:\n{string.Join('\n', exceptions.Select(e => e.ToString()))}");
             }
         }
     }
