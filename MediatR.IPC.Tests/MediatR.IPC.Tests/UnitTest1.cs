@@ -234,5 +234,30 @@ namespace MediatR.IPC.Tests
             Assert.IsTrue(request4.Data.SequenceEqual(response4));
             this.VerifyRequest<HugeRequest>(Times.Exactly(4));
         }
+
+        [Test]
+        public async Task CancellingRequest_Handler_IsSignaled()
+        {
+            using var cts = new CancellationTokenSource();
+            var tcs = new TaskCompletionSource();
+
+            this.SetupRequest<SlowRequest, Response>(async (SlowRequest r, CancellationToken c) =>
+            {
+                await Task.Delay(250, default);
+                tcs.SetResult();
+                await Task.Delay(250, c);
+                return new Response();
+            });
+            var request1 = new SlowRequest();
+
+            var responseTask1 = clientPool.Send(request1, cts.Token);
+            await tcs.Task;
+            cts.Cancel();
+
+            Assert.ThrowsAsync<OperationCanceledException>(async () => await responseTask1);
+            this.VerifyRequest<SlowRequest>(Times.Once());
+            Sender.Verify(s => s.Send(It.Is<object>(o => o is SlowRequest), It.Is<CancellationToken>(c => c.IsCancellationRequested)), Times.Once());
+            Sender.Verify(s => s.Send(It.Is<object>(o => o is SlowRequest), It.Is<CancellationToken>(c => c.IsCancellationRequested)), Times.Once());
+        }
     }
 }

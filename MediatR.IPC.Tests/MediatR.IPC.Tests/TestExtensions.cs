@@ -41,6 +41,17 @@ namespace MediatR.IPC.Tests
                 .Returns(res);
         }
 
+        public static void SetupRequest<TRequest, TResponse>(this TestBase source, Func<TRequest, CancellationToken, Task<TResponse>> response)
+            where TRequest : IRequest<TResponse>
+        {
+            source.Sender.Setup(s => s.Send<TResponse>(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
+                .Returns(response);
+
+            Func<TRequest, CancellationToken, Task<object>> res = async (r, c) => await response(r, c);
+            source.Sender.Setup(s => s.Send(It.Is<object>(o => o is TRequest), It.IsAny<CancellationToken>()))
+                .Returns(res);
+        }
+
         public static void VerifyRequest<TRequest>(this TestBase source, Times times)
         {
             source.Sender.Verify(s => s.Send(It.Is<object>(o => o is TRequest), It.IsAny<CancellationToken>()), times);
