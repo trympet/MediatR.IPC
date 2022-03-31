@@ -38,10 +38,11 @@ namespace MediatR.IPC
                 response = e;
             }
 
-            await SendResponseAsync(request, response, responseStream).ConfigureAwait(false);
+            token.ThrowIfCancellationRequested();
+            await SendResponseAsync(request, response, responseStream, token).ConfigureAwait(false);
         }
 
-        private static async Task SendResponseAsync(Request request, object? response, Stream stream)
+        private static async Task SendResponseAsync(Request request, object? response, Stream stream, CancellationToken token)
         {
             Message responseMessage;
             if (response is Exception e)
@@ -57,8 +58,9 @@ namespace MediatR.IPC
                 var responseSerialized = await SerializeContentAsync(response).ConfigureAwait(false);
                 responseMessage = new Message(request.Name, responseSerialized);
             }
+            token.ThrowIfCancellationRequested();
             responseMessage.Serialize(stream);
-            await stream.FlushAsync().ConfigureAwait(false);
+            await stream.FlushAsync(token).ConfigureAwait(false);
         }
     }
 }

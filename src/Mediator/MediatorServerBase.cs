@@ -58,11 +58,7 @@ namespace MediatR.IPC
             {
                 var completionSource = ProcessMessage(request, message, responseStream, requestToken);
                 var cancellationSource = GetStreamEofTask(responseStream, requestToken);
-                var result = await Task.WhenAny(completionSource, cancellationSource).ConfigureAwait(false);
-                if (result == cancellationSource)
-                {
-                    await completionSource.ConfigureAwait(false);
-                }
+                await Task.WhenAny(completionSource, cancellationSource).ConfigureAwait(false);
             }
             catch (OperationCanceledException) { }
             catch (IOException)

@@ -37,7 +37,7 @@ namespace MediatR.IPC
                     result = pipe;
                 }
 
-                token.Register(result.Dispose);
+                token.Register(() => result.Dispose());
                 return result;
             }
         }
