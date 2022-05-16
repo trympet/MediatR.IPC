@@ -62,6 +62,19 @@ namespace MediatR
         }
 
         /// <summary>
+        /// Registers a request with a given response.
+        /// </summary>
+        /// <remarks>
+        /// This overload does not utilize reflection. An invalid parameter for <paramref name="request"/> or <paramref name="response"/> can lead to runtime failures.
+        /// </remarks>
+        /// <param name="request">The concrete type of the request; an instance of <see cref="MediatR.IRequest{TResponse}"/>.</param>
+        /// <param name="response">The type corresponding to the <c>TResponse</c> type argument in <see cref="MediatR.IRequest{TResponse}"/>.</param>
+        public static void RegisterType(Type request, Type response)
+        {
+            Requests.Add(new Request(request, response));
+        }
+
+        /// <summary>
         /// Registers a list of request types.
         /// </summary>
         /// <param name="types"></param>
