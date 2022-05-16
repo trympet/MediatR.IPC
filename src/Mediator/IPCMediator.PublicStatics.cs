@@ -14,7 +14,7 @@ namespace MediatR
         private static readonly Type RequestType = typeof(IRequest<>);
         private static readonly Type UnitType = typeof(Unit);
 
-        internal static readonly HashSet<Request> Requests = new HashSet<Request>();
+        internal static readonly Dictionary<string, Request> Requests = new();
 
         internal static readonly RuntimeTypeModel Serializer = InitializeRuntimeTypeModel();
 
@@ -58,7 +58,7 @@ namespace MediatR
             where T : IBaseRequest
         {
             var requestType = typeof(T);
-            Requests.Add(Finalize(requestType));
+            AddRequest(Finalize(requestType));
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace MediatR
         /// <param name="response">The type corresponding to the <c>TResponse</c> type argument in <see cref="MediatR.IRequest{TResponse}"/>.</param>
         public static void RegisterType(Type request, Type response)
         {
-            Requests.Add(new Request(request, response));
+            AddRequest(new Request(request, response));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace MediatR
         {
             foreach (var request in types)
             {
-                Requests.Add(Finalize(request));
+                AddRequest(Finalize(request));
             }
         }
 
@@ -111,7 +111,7 @@ namespace MediatR
             var unfinalizedTypes = UnfinalizedRequests.SelectMany(r => r.Value);
             foreach (var unfinalized in unfinalizedTypes)
             {
-                Requests.Add(Finalize(unfinalized));
+                AddRequest(Finalize(unfinalized));
             }
 
             UnfinalizedRequests.Clear();
@@ -133,5 +133,7 @@ namespace MediatR
             typeModel.AutoAddMissingTypes = true;
             return typeModel;
         }
+
+        private static void AddRequest(Request request) => Requests[request.Name] = request;
     }
 }

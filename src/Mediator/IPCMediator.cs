@@ -98,7 +98,7 @@ namespace MediatR
 
         private protected static Request? FindRequest(Message message)
         {
-            return Requests.FirstOrDefault(r => r.Name == message.Name);
+            return Requests.TryGetValue(message.Name, out var value) ? value : null;
         }
 
         private protected static object DeserializeContent(Message message, Type contentType)
