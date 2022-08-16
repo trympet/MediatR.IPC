@@ -14,21 +14,15 @@
     <RepositoryUrl>https://github.com/trympet/MediatR.IPC.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <PackageTags>mediatr mediator ipc inter-process</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>3.1.0</Version>
+    <Version>3.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="9.0.0" />
-    <PackageReference Include="protobuf-net" Version="3.0.101" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-      <PackageReference Include="Microsoft.Build.Tasks.Git" Version="1.1.1">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-      </PackageReference>
+    <PackageReference Include="protobuf-net" Version="3.1.17" />
   </ItemGroup>
 
 </Project>
