@@ -14,7 +14,6 @@
     <RepositoryUrl>https://github.com/trympet/MediatR.IPC.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <PackageTags>mediatr mediator ipc inter-process</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
