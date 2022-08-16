@@ -75,7 +75,9 @@ namespace MediatR.IPC
 
         private static Task<int> GetStreamEofTask(Stream responseStream, CancellationToken requestToken)
         {
-            return responseStream.ReadAsync(new byte[1], requestToken).AsTask();
+            return requestToken.IsCancellationRequested
+                ? Task.FromCanceled<int>(requestToken)
+                : responseStream.ReadAsync(new byte[1], requestToken).AsTask();
         }
     }
 }
