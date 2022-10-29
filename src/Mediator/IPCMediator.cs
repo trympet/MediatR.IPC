@@ -110,5 +110,10 @@ namespace MediatR
 
         private protected static TContent DeserializeContent<TContent>(Message message)
             => (TContent)DeserializeContent(message, typeof(TContent));
+
+        protected internal static Exception GetAsyncStreamNotSupportedException()
+        {
+            throw new NotSupportedException("Stream methods are not implemented by MediatR.IPC.");
+        }
     }
 }

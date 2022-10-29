@@ -25,6 +25,9 @@ public static async Task Main(string[] args)
                .WithAttribute<IPCRequestAttribute>()
                .Where(...);
     IPCMediator.RegisterType<MyFancyCommand>();
+
+    // Use the default runtime type model from protobuf-net
+    IPCMediator.TypeModel = RuntimeTypeModel.Default;
         
     // Resolve the ISender, so the server can proxy incoming requests.
     ISender sender = MyContainer.Resolve<ISender>();

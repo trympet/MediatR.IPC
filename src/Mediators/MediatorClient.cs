@@ -1,7 +1,7 @@
 ﻿using MediatR.IPC.Exceptions;
 using MediatR.IPC.Messages;
 using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,7 +28,7 @@ namespace MediatR.IPC
         }
 
 #if NET5_0_OR_GREATER
-        [MemberNotNullWhen(true, nameof(pipeSemaphore))]
+        [System.Diagnostics.CodeAnalysis.MemberNotNullWhen(true, nameof(pipeSemaphore))]
 #endif
         private bool ThreadSafe { get; }
 
@@ -102,6 +102,16 @@ namespace MediatR.IPC
             }
 
             return DeserializeContent(response, contentType);
+        }
+
+        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)
+        {
+            throw GetAsyncStreamNotSupportedException();
+        }
+
+        public IAsyncEnumerable<object?> CreateStream(object request, CancellationToken cancellationToken = default)
+        {
+            throw GetAsyncStreamNotSupportedException();
         }
     }
 }

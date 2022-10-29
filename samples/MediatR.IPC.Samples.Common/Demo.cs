@@ -1,5 +1,6 @@
 ﻿using MediatR.IPC.Samples.AssemblyScan;
 using MediatR.IPC.Samples.Common.Requests;
+using ProtoBuf;
 using ProtoBuf.Meta;
 using System;
 using System.Collections.Generic;
@@ -54,7 +55,7 @@ namespace MediatR.IPC.Samples.Common
         private void ConfigureIPCMediator()
         {
             IPCMediator.UseTransport(IPCTransport.NamedPipe);
-            IPCMediator.TypeModel = RuntimeTypeModel.Create();
+            IPCMediator.TypeModel = RuntimeTypeModel.Default;
             IPCMediator
                 .RegisterAssemblyTypes(typeof(AssemblyScan.AssemblyScan).Assembly)
                 .WithAttribute<IPCRequestAttribute>();

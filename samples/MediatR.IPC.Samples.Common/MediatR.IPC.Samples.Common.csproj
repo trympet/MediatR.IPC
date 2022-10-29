@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="protobuf-net" Version="3.1.22" />
   </ItemGroup>
 

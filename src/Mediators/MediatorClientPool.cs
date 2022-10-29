@@ -89,5 +89,15 @@ namespace MediatR.IPC
             }
             poolSemaphore.Dispose();
         }
+
+        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)
+        {
+            throw IPCMediator.GetAsyncStreamNotSupportedException();
+        }
+
+        public IAsyncEnumerable<object?> CreateStream(object request, CancellationToken cancellationToken = default)
+        {
+            throw IPCMediator.GetAsyncStreamNotSupportedException();
+        }
     }
 }
