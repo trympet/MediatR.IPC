@@ -1,9 +1,11 @@
 ﻿using ProtoBuf;
 using ProtoBuf.Meta;
+using ProtoBuf.Serializers;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,8 +42,7 @@ namespace MediatR.IPC.Messages
             Name = "NULL";
         }
 
-        private static RuntimeTypeModel TypeModel => IPCMediator.Serializer;
-
+        private static TypeModel TypeModel => IPCMediator.TypeModel;
 
         [ProtoMember(1)]
         public string Name { get; set; } = string.Empty;
@@ -58,7 +59,7 @@ namespace MediatR.IPC.Messages
         [ProtoMember(5)]
         public string? ErrorMessage { get; private set; }
 
-        public bool IsNullResponse => !Content.Any() && Name == "NULL";
+        public bool IsNullResponse => Content.Length == 0 && Name == "NULL";
 
         public static async Task<Message> Deserialize(Stream stream, CancellationToken cancellationToken)
         {
@@ -74,12 +75,13 @@ namespace MediatR.IPC.Messages
             }
 
             Debug.Assert(bufferWriter.WrittenCount == expectedLength, $"Expected {expectedLength}, but got {bufferWriter.WrittenCount}");
-            return TypeModel.Deserialize<Message>(bufferWriter.WrittenMemory);
+
+            return MessageSerializer.Deserialize(bufferWriter.WrittenMemory);
         }
 
         public void Serialize(Stream stream)
         {
-            TypeModel.SerializeWithLengthPrefix(stream, this, typeof(Message), ProtoBuf.PrefixStyle.Base128, LengthPrefixFieldNumber);
+            MessageSerializer.SerializeWithLengthPrefix(stream, this);
         }
 
         private static async Task<uint> GetMessageLength(Stream stream, CancellationToken cancellationToken)
@@ -116,6 +118,135 @@ namespace MediatR.IPC.Messages
             }
 
             Debug.Assert((buffer.Span[0] & 0x07) == varintWireType && ((buffer.Span[0] >> fieldTypeShift) == LengthPrefixFieldNumber));
+        }
+
+        private sealed class MessageSerializer : ISerializer<Message>
+        {
+            private static readonly MessageSerializer Instance = new MessageSerializer();
+
+            private MessageSerializer()
+            {
+            }
+
+            public SerializerFeatures Features => SerializerFeatures.WireTypeString | SerializerFeatures.CategoryMessage;
+
+            public static Message Deserialize(in ReadOnlyMemory<byte> source)
+            {
+                using var state = ProtoReader.State.Create(source, TypeModel);
+                return state.DeserializeRoot(new Message(), Instance);
+            }
+
+            public static void SerializeWithLengthPrefix(Stream dest, Message value)
+            {
+                ProtoWriter.State state = ProtoWriter.State.Create(dest, TypeModel);
+                try
+                {
+                    state.WriteMessage(LengthPrefixFieldNumber, Instance.Features, value, Instance);
+                    state.Flush();
+                    state.Close();
+                }
+                catch
+                {
+                    state.Abandon();
+                    throw;
+                }
+                finally
+                {
+                    state.Dispose();
+                }
+            }
+
+            public Message Read(ref ProtoReader.State state, Message value)
+            {
+                value ??= new();
+                int num;
+                while ((num = state.ReadFieldHeader()) > 0)
+                {
+                    switch (num)
+                    {
+                        case 1:
+                            {
+                                string text = state.ReadString(default(StringMap));
+                                if (text != null)
+                                {
+                                    value.Name = text;
+                                }
+                                break;
+                            }
+                        case 2:
+                            {
+                                MessageType messageType = (MessageType)state.ReadByte();
+                                value.MessageType = messageType;
+                                break;
+                            }
+                        case 3:
+                            {
+                                byte[] content = value.Content;
+                                content = state.AppendBytes(content);
+                                if (content != null)
+                                {
+                                    value.Content = content;
+                                }
+                                break;
+                            }
+                        case 4:
+                            {
+                                bool hasError = state.ReadBoolean();
+                                value.HasError = hasError;
+                                break;
+                            }
+                        case 5:
+                            {
+                                string text = state.ReadString(default(StringMap));
+                                if (text != null)
+                                {
+                                    value.ErrorMessage = text;
+                                }
+                                break;
+                            }
+                        default:
+                            state.SkipField();
+                            break;
+                    }
+                }
+                return value;
+            }
+
+            public void Write(ref ProtoWriter.State state, Message value)
+            {
+                string name = value.Name;
+                string text;
+                if (name != null)
+                {
+                    text = name;
+                    if (text != string.Empty)
+                    {
+                        state.WriteString(1, text, default(StringMap));
+                    }
+                }
+                MessageType messageType = value.MessageType;
+                if ((int)messageType != 0)
+                {
+                    state.WriteFieldHeader(2, WireType.Varint);
+                    byte b = (byte)(int)messageType;
+                    state.WriteByte(b);
+                }
+                byte[] content = value.Content;
+                if (content != null)
+                {
+                    state.WriteFieldHeader(3, WireType.String);
+                    byte[] array = content;
+                    state.WriteBytes(array);
+                }
+                bool hasError = value.HasError;
+                if (hasError)
+                {
+                    state.WriteFieldHeader(4, WireType.Varint);
+                    state.WriteBoolean(hasError);
+                }
+                text = value.ErrorMessage!;
+                state.WriteString(5, text, default(StringMap));
+            }
         }
     }
 }

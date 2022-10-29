@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="9.*" />
-    <PackageReference Include="protobuf-net" Version="3.*" />
+    <PackageReference Include="protobuf-net.Core" Version="3.*" />
   </ItemGroup>
 
 </Project>

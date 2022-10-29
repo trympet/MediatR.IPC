@@ -13,10 +13,15 @@ namespace MediatR
         private static readonly Type NotificationType = typeof(INotification);
         private static readonly Type RequestType = typeof(IRequest<>);
         private static readonly Type UnitType = typeof(Unit);
+        private static TypeModel? CurrentTypeModel;
 
         internal static readonly Dictionary<string, Request> Requests = new();
 
-        internal static readonly RuntimeTypeModel Serializer = InitializeRuntimeTypeModel();
+        public static TypeModel TypeModel
+        {
+            get => CurrentTypeModel ?? throw new InvalidOperationException("Type model not set. Ensure IPCMediator.TypeModel is set.");
+            set => CurrentTypeModel = value;
+        }
 
         private static readonly List<IPCBuilderContext<IEnumerable<Type>>> UnfinalizedRequests
             = new List<IPCBuilderContext<IEnumerable<Type>>>();
@@ -33,7 +38,7 @@ namespace MediatR
                 .Where<Type>(t => t
                     .GetInterfaces()
                     .Any(i => IsRequest(i) || IsNotification(i))
-                );
+            );
 
             var builder = new IPCBuilder<Assembly, IEnumerable<Type>>(requests);
             UnfinalizedRequests.Add(builder.BuilderContext);
@@ -86,8 +91,9 @@ namespace MediatR
             }
         }
 
-        public static RuntimeTypeModel GetRuntimeTypeModel()
-            => Serializer;
+        [Obsolete]
+        public static TypeModel GetRuntimeTypeModel()
+            => TypeModel;
 
         public static void UseTransport(IStreamStratergy stratergy)
         {
@@ -125,13 +131,6 @@ namespace MediatR
                 ?.FirstOrDefault();
 
             return new Request(request, response ?? UnitType);
-        }
-
-        private static RuntimeTypeModel InitializeRuntimeTypeModel()
-        {
-            var typeModel = RuntimeTypeModel.Create("MediatorTypeModel");
-            typeModel.AutoAddMissingTypes = true;
-            return typeModel;
         }
 
         private static void AddRequest(Request request) => Requests[request.Name] = request;

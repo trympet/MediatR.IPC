@@ -70,7 +70,7 @@ namespace MediatR
         protected static async Task<byte[]> SerializeContentAsync(object? request)
         {
             using var serializationStream = new MemoryStream();
-            Serializer.Serialize(serializationStream, request);
+            TypeModel.Serialize(serializationStream, request);
             serializationStream.Position = 0;
             var buffer = new byte[serializationStream.Length];
             await serializationStream.ReadAsync(buffer).ConfigureAwait(false);
@@ -104,7 +104,7 @@ namespace MediatR
         private protected static object DeserializeContent(Message message, Type contentType)
         {
             var x = new ReadOnlySpan<byte>(message.Content);
-            var messageContent = Serializer.Deserialize(contentType, x);
+            var messageContent = TypeModel.Deserialize(contentType, x);
             return messageContent;
         }
 

@@ -1,5 +1,6 @@
 using Moq;
 using NUnit.Framework;
+using ProtoBuf.Meta;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,7 @@ namespace MediatR.IPC.Tests
         static Tests()
         {
             IPCMediator.RegisterAssemblyTypes(Assembly.GetExecutingAssembly());
+            IPCMediator.TypeModel = RuntimeTypeModel.Create();
             IPCMediator.UseTransport(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? IPCTransport.NamedPipe : IPCTransport.UnixDomainSocket);
         }
 
