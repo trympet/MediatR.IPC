@@ -8,7 +8,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Samples.AspNetCore.Pages
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif.Samples.AspNetCore.Pages
 {
     public class IndexModel : PageModel
     {

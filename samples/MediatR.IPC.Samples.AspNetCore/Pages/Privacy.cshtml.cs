@@ -6,7 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Samples.AspNetCore.Pages
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif.Samples.AspNetCore.Pages
 {
     public class PrivacyModel : PageModel
     {

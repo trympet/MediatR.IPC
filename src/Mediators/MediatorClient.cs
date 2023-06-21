@@ -1,11 +1,21 @@
-﻿using MediatR.IPC.Exceptions;
+﻿#if MEDIATR
+using MediatR.IPC.Exceptions;
 using MediatR.IPC.Messages;
+#else
+using Mediator.IPC.Exceptions;
+using Mediator.IPC.Messages;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif
 {
     /// <summary>
     /// Represents a mediator client, used for sending messages.
@@ -35,7 +45,13 @@ namespace MediatR.IPC
         /// <inheritdoc/>
         /// <exception cref="IPCException">Thrown when the server sends back an exception.</exception>
         /// <exception cref="TaskCanceledException">Thrown if cancellation is requested.</exception>
-        public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+        public async
+#if MEDIATR
+            Task<TResponse>
+#else
+            ValueTask<TResponse>
+#endif
+            Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
             if (ThreadSafe)
             {
@@ -56,7 +72,13 @@ namespace MediatR.IPC
         }
 
         /// <inheritdoc/>
-        public async Task<object?> Send(object request, CancellationToken cancellationToken = default)
+        public async
+#if MEDIATR
+            Task<object?>
+#else
+            ValueTask<object?>
+#endif
+            Send(object request, CancellationToken cancellationToken = default)
         {
             if (ThreadSafe)
             {
@@ -112,6 +134,26 @@ namespace MediatR.IPC
         public IAsyncEnumerable<object?> CreateStream(object request, CancellationToken cancellationToken = default)
         {
             throw GetAsyncStreamNotSupportedException();
+        }
+
+        public ValueTask<TResponse> Send<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<TResponse> Send<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamQuery<TResponse> query, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamCommand<TResponse> command, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -5,7 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Tests
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif
+.Tests
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public class HugeRequest : IRequest<byte[]>

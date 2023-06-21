@@ -1,6 +1,11 @@
 ﻿using System;
 
-namespace MediatR.IPC.Messages
+namespace
+#if MEDIATR
+MediatR.IPC.Messages
+#else
+Mediator.IPC.Messages
+#endif
 {
     public sealed class Request
     {

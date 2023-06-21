@@ -1,6 +1,11 @@
 ﻿using System;
 
-namespace MediatR
+namespace
+#if MEDIATR
+MediatR
+#else
+Mediator
+#endif
 {
     public class IPCBuilderContext<TContext>
     {

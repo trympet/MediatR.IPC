@@ -9,7 +9,13 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Tests
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif
+.Tests
 {
     public class TestBase
     {
@@ -76,7 +82,7 @@ namespace MediatR.IPC.Tests
         [Test]
         public void Send_SingleVoidRequest_DoesNotThrow()
         {
-            Assert.DoesNotThrowAsync(() => clientPool.Send(new VoidRequest()));
+            Assert.DoesNotThrowAsync(async () => await clientPool.Send(new VoidRequest()));
         }
 
         [Test]
@@ -84,7 +90,7 @@ namespace MediatR.IPC.Tests
         {
             for (int i = 0; i < ParallellCount; i++)
             {
-                Assert.DoesNotThrowAsync(() => clientPool.Send(new VoidRequest()));
+                Assert.DoesNotThrowAsync(async () => await clientPool.Send(new VoidRequest()));
             }
 
             this.VerifyRequest<VoidRequest>(Times.Exactly(ParallellCount));
@@ -150,7 +156,7 @@ namespace MediatR.IPC.Tests
         [Test]
         public void Send_SlowRequestsInParallell_DoesNotThrow()
         {
-            this.RunInParallell(ParallellCount, () => clientPool.Send(new SlowRequest()));
+            this.RunInParallell(ParallellCount, async () => await clientPool.Send(new SlowRequest()));
 
             this.VerifyRequest<SlowRequest>(Times.Exactly(ParallellCount));
         }
@@ -206,7 +212,7 @@ namespace MediatR.IPC.Tests
             clientPool = new MediatorClientPool("testpool", poolSize);
             serverPool = new MediatorServerPool(Sender.Object, "testpool", poolSize);
             serverTask = Task.Run(serverPool.Run, cts.Token);
-            AsyncTestDelegate task = () => clientPool.Send(new VoidRequest());
+            AsyncTestDelegate task = async () => await clientPool.Send(new VoidRequest());
 
             Assert.DoesNotThrowAsync(task);
         }
@@ -219,10 +225,10 @@ namespace MediatR.IPC.Tests
             var request3 = HugeRequest.Create(3_000_000);
             var request4 = HugeRequest.Create(10_000_000);
 
-            var responseTask1 = clientPool.Send(request1);
-            var responseTask2 = clientPool.Send(request2);
-            var responseTask3 = clientPool.Send(request3);
-            var responseTask4 = clientPool.Send(request4);
+            var responseTask1 = clientPool.Send(request1).AsTask();
+            var responseTask2 = clientPool.Send(request2).AsTask();
+            var responseTask3 = clientPool.Send(request3).AsTask();
+            var responseTask4 = clientPool.Send(request4).AsTask();
 
             var res = await Task.WhenAll(responseTask1, responseTask2, responseTask3, responseTask4);
             var response1 = res[0];

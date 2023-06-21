@@ -9,7 +9,12 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Messages
+namespace
+#if MEDIATR
+MediatR.IPC.Messages
+#else
+Mediator.IPC.Messages
+#endif
 {
     [ProtoContract]
     internal class Message

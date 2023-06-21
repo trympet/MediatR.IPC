@@ -5,7 +5,12 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif
 {
     public class UnixDomainSocketOptions
     {

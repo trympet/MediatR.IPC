@@ -6,7 +6,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Samples.Common.Requests
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif.Samples.Common.Requests
 {
     public class ApplicationStateQueryHandler : IRequestHandler<ApplicationStateQuery, ApplicationStateDto>
     {

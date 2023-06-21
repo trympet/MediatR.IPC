@@ -1,12 +1,22 @@
-﻿using MediatR.IPC;
+﻿#if MEDIATR
+using MediatR.IPC;
 using MediatR.IPC.Messages;
+#else
+using Mediator.IPC;
+using Mediator.IPC.Messages;
+#endif
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR
+namespace
+#if MEDIATR
+MediatR
+#else
+Mediator
+#endif
 {
     public abstract partial class IPCMediator : IDisposable
     {

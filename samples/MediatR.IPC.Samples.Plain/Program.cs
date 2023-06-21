@@ -7,7 +7,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Samples.Plain
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif.Samples.Plain
 {
     internal class Program : ProgramBase
     {

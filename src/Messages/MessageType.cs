@@ -1,4 +1,9 @@
-﻿namespace MediatR.IPC.Messages
+﻿namespace
+#if MEDIATR
+MediatR.IPC.Messages
+#else
+Mediator.IPC.Messages
+#endif
 {
     internal enum MessageType : byte
     {

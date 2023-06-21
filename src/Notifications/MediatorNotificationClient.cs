@@ -1,10 +1,19 @@
-﻿using MediatR.IPC.Messages;
+﻿#if MEDIATR
+using MediatR.IPC.Messages;
+#else
+using Mediator.IPC.Messages;
+#endif
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Notifications
+namespace
+#if MEDIATR
+MediatR.IPC.Notifications
+#else
+Mediator.IPC.Notifications
+#endif
 {
     public class MediatorNotificationClient : MediatorServerBase
     {

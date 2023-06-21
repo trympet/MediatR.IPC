@@ -5,8 +5,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+#if MEDIATR
+using TaskType = System.Threading.Tasks.Task;
+#else
+using TaskType = System.Threading.Tasks.ValueTask;
+#endif
 
-namespace MediatR.IPC.Tests
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif
+.Tests
 {
     public static class TestExtensions
     {
@@ -17,7 +28,7 @@ namespace MediatR.IPC.Tests
                 .ReturnsAsync(response);
 
             source.Sender.Setup(s => s.Send(It.Is<object>(o => o is TRequest), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult((object)response));
+                .Returns(TaskType.FromResult((object)response));
         }
 
         public static void SetupRequest<TRequest, TResponse>(this TestBase source, Func<TRequest, CancellationToken, TResponse> response)
@@ -27,29 +38,27 @@ namespace MediatR.IPC.Tests
                 .ReturnsAsync(response);
 
             source.Sender.Setup(s => s.Send(It.Is<object>(o => o is TRequest), It.IsAny<CancellationToken>()))
-                .Returns<TRequest, CancellationToken>((a, b) => Task.FromResult((object)response(a, b)));
+                .Returns<TRequest, CancellationToken>((a, b) => TaskType.FromResult((object)response(a, b)));
         }
 
         public static void SetupRequest<TRequest, TResponse>(this TestBase source, Func<Task<TResponse>> response)
             where TRequest : IRequest<TResponse>
         {
             source.Sender.Setup(s => s.Send<TResponse>(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
-                .Returns(response);
+                .Returns(async () => await response());
 
-            Func<Task<object>> res = async () => await response();
             source.Sender.Setup(s => s.Send(It.Is<object>(o => o is TRequest), It.IsAny<CancellationToken>()))
-                .Returns(res);
+                .Returns(async () => await response());
         }
 
         public static void SetupRequest<TRequest, TResponse>(this TestBase source, Func<TRequest, CancellationToken, Task<TResponse>> response)
             where TRequest : IRequest<TResponse>
         {
             source.Sender.Setup(s => s.Send<TResponse>(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
-                .Returns(response);
+                .Returns(async (TRequest r, CancellationToken c) => await response(r, c));
 
-            Func<TRequest, CancellationToken, Task<object>> res = async (r, c) => await response(r, c);
             source.Sender.Setup(s => s.Send(It.Is<object>(o => o is TRequest), It.IsAny<CancellationToken>()))
-                .Returns(res);
+                .Returns(async (TRequest r, CancellationToken c) => await response(r, c));
         }
 
         public static void VerifyRequest<TRequest>(this TestBase source, Times times)

@@ -5,7 +5,12 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Samples.AutoFac
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif.Samples.AutoFac
 {
     public class Program : ProgramBase
     {

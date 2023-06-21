@@ -10,7 +10,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Samples.Common
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif.Samples.Common
 {
     public class Demo
     {

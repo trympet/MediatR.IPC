@@ -1,10 +1,19 @@
-﻿using MediatR.IPC.Messages;
+﻿#if MEDIATR
+using MediatR.IPC.Messages;
+#else
+using Mediator.IPC.Messages;
+#endif
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif
 {
     /// <summary>
     /// Represents a runner for receiving and dispatching IPC messages.

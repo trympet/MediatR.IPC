@@ -17,40 +17,55 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.IPC.Tests", "Mediat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.IPC.Samples.Plain", "samples\MediatR.IPC.Samples.Plain\MediatR.IPC.Samples.Plain.csproj", "{68EC411A-2C9E-4CD4-B910-7B614AAFD8F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediatR.IPC.Samples.AspNetCore", "samples\MediatR.IPC.Samples.AspNetCore\MediatR.IPC.Samples.AspNetCore.csproj", "{87795A5D-9782-431E-BEC7-538494A813DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatR.IPC.Samples.AspNetCore", "samples\MediatR.IPC.Samples.AspNetCore\MediatR.IPC.Samples.AspNetCore.csproj", "{87795A5D-9782-431E-BEC7-538494A813DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Mediator|Any CPU = Mediator|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0C5D58F3-5B41-42ED-B832-E9C08EE63978}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0C5D58F3-5B41-42ED-B832-E9C08EE63978}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C5D58F3-5B41-42ED-B832-E9C08EE63978}.Mediator|Any CPU.ActiveCfg = Mediator|Any CPU
+		{0C5D58F3-5B41-42ED-B832-E9C08EE63978}.Mediator|Any CPU.Build.0 = Mediator|Any CPU
 		{0C5D58F3-5B41-42ED-B832-E9C08EE63978}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C5D58F3-5B41-42ED-B832-E9C08EE63978}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7512DF6A-85F7-4C30-9091-A1CB3F2A7901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7512DF6A-85F7-4C30-9091-A1CB3F2A7901}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7512DF6A-85F7-4C30-9091-A1CB3F2A7901}.Mediator|Any CPU.ActiveCfg = Mediator|Any CPU
+		{7512DF6A-85F7-4C30-9091-A1CB3F2A7901}.Mediator|Any CPU.Build.0 = Mediator|Any CPU
 		{7512DF6A-85F7-4C30-9091-A1CB3F2A7901}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7512DF6A-85F7-4C30-9091-A1CB3F2A7901}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FECB7ED3-0B6A-4F27-9159-55DD97BC3456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FECB7ED3-0B6A-4F27-9159-55DD97BC3456}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FECB7ED3-0B6A-4F27-9159-55DD97BC3456}.Mediator|Any CPU.ActiveCfg = Mediator|Any CPU
+		{FECB7ED3-0B6A-4F27-9159-55DD97BC3456}.Mediator|Any CPU.Build.0 = Mediator|Any CPU
 		{FECB7ED3-0B6A-4F27-9159-55DD97BC3456}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FECB7ED3-0B6A-4F27-9159-55DD97BC3456}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2519F133-C69C-47A3-929E-6ED4CF122D11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2519F133-C69C-47A3-929E-6ED4CF122D11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2519F133-C69C-47A3-929E-6ED4CF122D11}.Mediator|Any CPU.ActiveCfg = Mediator|Any CPU
+		{2519F133-C69C-47A3-929E-6ED4CF122D11}.Mediator|Any CPU.Build.0 = Mediator|Any CPU
 		{2519F133-C69C-47A3-929E-6ED4CF122D11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2519F133-C69C-47A3-929E-6ED4CF122D11}.Release|Any CPU.Build.0 = Release|Any CPU
 		{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}.Mediator|Any CPU.ActiveCfg = Mediator|Any CPU
+		{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}.Mediator|Any CPU.Build.0 = Mediator|Any CPU
 		{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36513625-B6AB-4FD4-BAA5-3540DC4C05FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{68EC411A-2C9E-4CD4-B910-7B614AAFD8F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{68EC411A-2C9E-4CD4-B910-7B614AAFD8F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68EC411A-2C9E-4CD4-B910-7B614AAFD8F2}.Mediator|Any CPU.ActiveCfg = Mediator|Any CPU
+		{68EC411A-2C9E-4CD4-B910-7B614AAFD8F2}.Mediator|Any CPU.Build.0 = Mediator|Any CPU
 		{68EC411A-2C9E-4CD4-B910-7B614AAFD8F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68EC411A-2C9E-4CD4-B910-7B614AAFD8F2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{87795A5D-9782-431E-BEC7-538494A813DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{87795A5D-9782-431E-BEC7-538494A813DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87795A5D-9782-431E-BEC7-538494A813DF}.Mediator|Any CPU.ActiveCfg = Mediator|Any CPU
+		{87795A5D-9782-431E-BEC7-538494A813DF}.Mediator|Any CPU.Build.0 = Mediator|Any CPU
 		{87795A5D-9782-431E-BEC7-538494A813DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87795A5D-9782-431E-BEC7-538494A813DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

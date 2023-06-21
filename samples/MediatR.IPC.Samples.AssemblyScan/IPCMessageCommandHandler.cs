@@ -5,7 +5,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Samples.AssemblyScan
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif.Samples.AssemblyScan
 {
     public class IPCMessageCommandHandler : IRequestHandler<IPCMessageCommand, bool>
     {

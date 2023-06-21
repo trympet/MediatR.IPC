@@ -10,7 +10,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC.Samples.AspNetCore
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif.Samples.AspNetCore
 {
     public class Startup
     {

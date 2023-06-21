@@ -2,7 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MediatR.IPC
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif
 {
     /// <summary>
     /// Represents a stream provider for IPC communication.

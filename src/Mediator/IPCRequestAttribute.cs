@@ -1,6 +1,11 @@
 ﻿using System;
 
-namespace MediatR
+namespace
+#if MEDIATR
+MediatR
+#else
+Mediator
+#endif
 {
     /// <summary>
     /// Indicates that a request can be sent via an IPC transport.

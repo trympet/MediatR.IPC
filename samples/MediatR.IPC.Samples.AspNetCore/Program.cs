@@ -10,7 +10,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediatR.IPC.Samples.Common.Requests;
 
-namespace MediatR.IPC.Samples.AspNetCore
+namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif.Samples.AspNetCore
 {
     public class Program : ProgramBase
     {

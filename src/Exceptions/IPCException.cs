@@ -1,6 +1,11 @@
 ﻿using System;
 
-namespace MediatR.IPC.Exceptions
+namespace
+#if MEDIATR
+MediatR.IPC.Exceptions
+#else
+Mediator.IPC.Exceptions
+#endif
 {
     public class IPCException : Exception
     {

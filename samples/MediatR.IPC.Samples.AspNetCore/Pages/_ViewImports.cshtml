@@ -1,3 +1,8 @@
 ﻿@using MediatR.IPC.Samples.AspNetCore
-@namespace MediatR.IPC.Samples.AspNetCore.Pages
+@namespace
+#if MEDIATR
+MediatR.IPC
+#else
+Mediator.IPC
+#endif.Samples.AspNetCore.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace MediatR
+namespace
+#if MEDIATR
+MediatR
+#else
+Mediator
+#endif
 {
     public static class IPCBuilderExtensions
     {
