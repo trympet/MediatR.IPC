@@ -21,6 +21,8 @@ Mediator.IPC
 {
     public static class TestExtensions
     {
+        public static Task<T> AsTask<T>(this Task<T> task) => task;
+
         public static void SetupRequest<TRequest, TResponse>(this TestBase source, TResponse response)
             where TRequest : IRequest<TResponse>
         {

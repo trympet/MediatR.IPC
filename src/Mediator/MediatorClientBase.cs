@@ -2,9 +2,8 @@
 using MediatR.IPC.Messages;
 #else
 using Mediator.IPC.Messages;
-using System;
-using System.Diagnostics;
 #endif
+using System;
 using System.IO;
 using System.Threading.Tasks;
 

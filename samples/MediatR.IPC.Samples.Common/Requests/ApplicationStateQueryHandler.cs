@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 #if MEDIATR
-using ResponseType = System.Threading.Tasks.Task<MediatR.IPC.Samples.Common.Requests.ApplicationStateDto>>;
+using ResponseType = System.Threading.Tasks.Task<MediatR.IPC.Samples.Common.Requests.ApplicationStateDto>;
 using TaskType = System.Threading.Tasks.Task;
 #else
 using ResponseType = System.Threading.Tasks.ValueTask<Mediator.IPC.Samples.Common.Requests.ApplicationStateDto>;

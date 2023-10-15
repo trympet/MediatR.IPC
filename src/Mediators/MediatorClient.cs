@@ -148,6 +148,7 @@ Mediator.IPC
         {
             throw GetAsyncStreamNotSupportedException();
         }
+#if !MEDIATR
 
         public ValueTask<TResponse> Send<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken = default)
         {
@@ -168,5 +169,6 @@ Mediator.IPC
         {
             throw new NotImplementedException();
         }
+#endif
     }
 }

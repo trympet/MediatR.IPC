@@ -230,6 +230,7 @@ Mediator.IPC
             var responseTask3 = clientPool.Send(request3).AsTask();
             var responseTask4 = clientPool.Send(request4).AsTask();
 
+            await Task.WhenAll(responseTask1, responseTask2, responseTask3, responseTask4);
             var res = await Task.WhenAll(responseTask1, responseTask2, responseTask3, responseTask4);
             var response1 = res[0];
             var response2 = res[1];

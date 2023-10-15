@@ -20,7 +20,6 @@
     <Version>4.1.0</Version>
 	<DebugType>embedded</DebugType>
 	<Configurations>Debug;Release;Mediator</Configurations>
-	<UseMediator>true</UseMediator>
 	<IsAotCompatible>true</IsAotCompatible>
 	<IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
