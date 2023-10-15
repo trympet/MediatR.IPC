@@ -1,12 +1,12 @@
-﻿using MediatR;
-using ProtoBuf;
+﻿using ProtoBuf;
 
 namespace
 #if MEDIATR
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.AssemblyScan
+#endif
+.Samples.AssemblyScan
 {
     [IPCRequest]
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]

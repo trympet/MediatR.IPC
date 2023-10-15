@@ -11,7 +11,8 @@ namespace
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.AspNetCore.Pages
+#endif
+.Samples.AspNetCore.Pages
 {
     public class PrivacyModel : PageModel
     {

@@ -3,7 +3,8 @@
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.AssemblyScan
+#endif
+.Samples.AssemblyScan
 {
     public class AssemblyScan
     {

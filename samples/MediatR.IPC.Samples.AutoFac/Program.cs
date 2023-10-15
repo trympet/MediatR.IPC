@@ -1,6 +1,11 @@
 ﻿using Autofac;
+#if MEDIATR
 using MediatR.IPC.Samples.Common;
 using MediatR.IPC.Samples.Common.Requests;
+#else
+using Mediator.IPC.Samples.Common;
+using Mediator.IPC.Samples.Common.Requests;
+#endif
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -10,7 +15,8 @@ namespace
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.AutoFac
+#endif
+.Samples.AutoFac
 {
     public class Program : ProgramBase
     {
@@ -42,11 +48,15 @@ Mediator.IPC
                 .InstancePerLifetimeScope();
 
             // request & notification handlers
+#if MEDIATR
             builder.Register<ServiceFactory>(context =>
             {
                 var c = context.Resolve<IComponentContext>();
                 return t => c.Resolve(t);
             });
+#else
+            throw new NotSupportedException("Mediator does not support Autofac.");
+#endif
 
             // finally register our custom code (individually, or via assembly scanning)
             // - requests & handlers as transient, i.e. InstancePerDependency()

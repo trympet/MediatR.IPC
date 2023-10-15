@@ -5,7 +5,8 @@ namespace
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.Common.Requests
+#endif
+.Samples.Common.Requests
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public record ApplicationStateDto

@@ -1,4 +1,10 @@
+#if MEDIATR
 using MediatR.IPC.Samples.Common;
+using MediatR.IPC.Samples.Common.Requests;
+#else
+using Mediator.IPC.Samples.Common;
+using Mediator.IPC.Samples.Common.Requests;
+#endif
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -8,14 +14,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MediatR.IPC.Samples.Common.Requests;
 
 namespace
 #if MEDIATR
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.AspNetCore
+#endif
+.Samples.AspNetCore
 {
     public class Program : ProgramBase
     {
@@ -43,7 +49,11 @@ Mediator.IPC
                 var builder = CreateHostBuilder(args);
                 builder.ConfigureServices(services =>
                 {
+#if MEDIATR
                     services.AddMediatR(typeof(AssemblyScan.AssemblyScan));
+#else
+                    services.AddMediator();
+#endif
                     services.AddScoped<ApplicationStateQueryHandler>();
                     services.AddScoped<Demo>();
                 });

@@ -1,6 +1,12 @@
-﻿using MediatR.IPC.Samples.AssemblyScan;
+﻿#if MEDIATR
+using MediatR.IPC.Samples.AssemblyScan;
 using MediatR.IPC.Samples.Common;
 using MediatR.IPC.Samples.Common.Requests;
+#else
+using Mediator.IPC.Samples.AssemblyScan;
+using Mediator.IPC.Samples.Common;
+using Mediator.IPC.Samples.Common.Requests;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +18,8 @@ namespace
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.Plain
+#endif
+.Samples.Plain
 {
     internal class Program : ProgramBase
     {
@@ -26,10 +33,24 @@ Mediator.IPC
 
         private Mediator mediator;
 
+#if MEDIATR
         public Program()
         {
             mediator = new Mediator(ServiceFactory);
         }
+#else
+
+        public Program()
+        {
+            mediator = new Mediator(new SP(ServiceFactory));
+        }
+        private sealed class SP : IServiceProvider
+        {
+            private Func<Type, object> serviceFactory;
+            public SP(Func<Type, object> serviceFactory) => this.serviceFactory = serviceFactory;
+            public object GetService(Type serviceType) => serviceFactory(serviceType);
+        }
+#endif
 
         public static async Task Main(string[] args)
         {

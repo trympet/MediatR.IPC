@@ -1,4 +1,8 @@
-﻿using MediatR.IPC.Samples.AssemblyScan;
+﻿#if MEDIATR
+using MediatR.IPC.Samples.AssemblyScan;
+#else
+using Mediator.IPC.Samples.AssemblyScan;
+#endif
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
@@ -13,7 +17,8 @@ namespace
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.AspNetCore.Pages
+#endif
+.Samples.AspNetCore.Pages
 {
     public class IndexModel : PageModel
     {

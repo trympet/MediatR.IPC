@@ -1,5 +1,10 @@
+#if MEDIATR
 using MediatR.IPC.Samples.AssemblyScan;
 using MediatR.IPC.Samples.Common;
+#else
+using Mediator.IPC.Samples.AssemblyScan;
+using Mediator.IPC.Samples.Common;
+#endif
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +20,8 @@ namespace
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.AspNetCore
+#endif
+.Samples.AspNetCore
 {
     public class Startup
     {

@@ -3,7 +3,8 @@
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.Common
+#endif
+.Samples.Common
 {
     // Void return type
     public class StartApplicationCommand

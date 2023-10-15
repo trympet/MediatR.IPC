@@ -12,7 +12,8 @@ namespace
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.AspNetCore.Pages
+#endif
+.Samples.AspNetCore.Pages
 {
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     [IgnoreAntiforgeryToken]

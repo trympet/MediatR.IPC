@@ -1,4 +1,8 @@
-﻿using MediatR.IPC.Samples.Common.Requests;
+﻿#if MEDIATR
+using MediatR.IPC.Samples.Common.Requests;
+#else
+using Mediator.IPC.Samples.Common.Requests;
+#endif
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -10,7 +14,8 @@ namespace
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.Common
+#endif
+.Samples.Common
 {
     public abstract class ProgramBase
     {

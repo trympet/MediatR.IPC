@@ -1,5 +1,10 @@
-﻿using MediatR.IPC.Samples.AssemblyScan;
+﻿#if MEDIATR
+using MediatR.IPC.Samples.AssemblyScan;
 using MediatR.IPC.Samples.Common.Requests;
+#else
+using Mediator.IPC.Samples.AssemblyScan;
+using Mediator.IPC.Samples.Common.Requests;
+#endif
 using ProtoBuf;
 using ProtoBuf.Meta;
 using System;
@@ -15,7 +20,8 @@ namespace
 MediatR.IPC
 #else
 Mediator.IPC
-#endif.Samples.Common
+#endif
+.Samples.Common
 {
     public class Demo
     {
