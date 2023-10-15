@@ -42,7 +42,7 @@ Mediator.IPC
                     result = pipe;
                 }
 
-                token.Register(() => result.Dispose());
+                token.Register(static x => ((Stream)x!).Dispose(), result);
                 return result;
             }
         }

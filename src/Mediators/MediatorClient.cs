@@ -7,6 +7,7 @@ using Mediator.IPC.Messages;
 #endif
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -51,7 +52,7 @@ Mediator.IPC
 #else
             ValueTask<TResponse>
 #endif
-            Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+            Send<[DynamicallyAccessedMembers(DynamicAccess.ContractType)] TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
             if (ThreadSafe)
             {
@@ -99,7 +100,7 @@ Mediator.IPC
             }
         }
 
-        private async Task<Message> SendImpl<T>(T request, CancellationToken cancellationToken) where T : notnull
+        private async Task<Message> SendImpl(object request, CancellationToken cancellationToken)
         {
             await using var pipe = await CreateAndRegisterStreamAsync(StreamType.ClientStream, cancellationToken).ConfigureAwait(false);
             await SendMessageAsync(request, pipe).ConfigureAwait(false);
@@ -108,10 +109,22 @@ Mediator.IPC
             return message;
         }
 
-        private TResponse DeserializeResponse<TResponse>(Message response)
-            => (TResponse)DeserializeResponse(response, typeof(TResponse));
+        private static TResponse DeserializeResponse<[DynamicallyAccessedMembers(DynamicAccess.ContractType)] TResponse>(Message response)
+        {
+            if (response.HasError)
+            {
+                throw new IPCException(response.ErrorMessage);
+            }
 
-        private static object DeserializeResponse(Message response, Type contentType)
+            if (response.IsNullResponse)
+            {
+                return default!;
+            }
+
+            return DeserializeContent<TResponse>(response);
+        }
+
+        private static object DeserializeResponse(Message response, [DynamicallyAccessedMembers(DynamicAccess.ContractType)] Type contentType)
         {
             if (response.HasError)
             {

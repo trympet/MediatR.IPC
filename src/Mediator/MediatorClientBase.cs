@@ -2,6 +2,8 @@
 using MediatR.IPC.Messages;
 #else
 using Mediator.IPC.Messages;
+using System;
+using System.Diagnostics;
 #endif
 using System.IO;
 using System.Threading.Tasks;
@@ -28,11 +30,29 @@ Mediator.IPC
         /// <param name="message">The message.</param>
         /// <param name="stream">The stream to send the message over.</param>
         /// <returns></returns>
-        protected static async Task SendMessageAsync<TMessage>(TMessage message, Stream stream)
+        protected static Task SendMessageAsync<TMessage>(TMessage message, Stream stream)
             where TMessage : notnull
         {
-            var requestSerialized = await SerializeContentAsync(message).ConfigureAwait(false);
-            var request = new Message(message.GetType().FullName ?? "UNKNOWN", requestSerialized);
+            var requestSerialized = SerializeContent<TMessage>(message);
+            return SendRequest(stream, requestSerialized, message.GetType());
+        }
+
+        /// <summary>
+        /// Sends a message to the server.
+        /// </summary>
+        /// <typeparam name="TMessage">The message type</typeparam>
+        /// <param name="message">The message.</param>
+        /// <param name="stream">The stream to send the message over.</param>
+        /// <returns></returns>
+        protected static Task SendMessageAsync(object message, Stream stream)
+        {
+            var requestSerialized = SerializeContent(message);
+            return SendRequest(stream, requestSerialized, message.GetType());
+        }
+
+        private static async Task SendRequest(Stream stream, ReadOnlyMemory<byte> requestSerialized, Type messageType)
+        {
+            var request = new Message(messageType.FullName ?? "UNKNOWN", requestSerialized);
             request.Serialize(stream);
             await stream.FlushAsync().ConfigureAwait(false);
         }

@@ -25,7 +25,7 @@ Mediator.IPC.Notifications
             await SendMessageAsync(notification, pipe).ConfigureAwait(false);
         }
 
-        public
+        public async
 #if MEDIATR
             Task
 #else
@@ -33,6 +33,9 @@ Mediator.IPC.Notifications
 #endif
             Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
             where TNotification : INotification
-            => Publish(notification, cancellationToken);
+        {
+            using var pipe = await CreateAndRegisterStreamAsync(StreamType.ClientStream, cancellationToken).ConfigureAwait(false);
+            await SendMessageAsync<TNotification>(notification, pipe).ConfigureAwait(false);
+        }
     }
 }

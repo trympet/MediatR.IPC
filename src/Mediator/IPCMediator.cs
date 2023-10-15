@@ -6,6 +6,9 @@ using Mediator.IPC;
 using Mediator.IPC.Messages;
 #endif
 using System;
+using System.Buffers;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -72,19 +75,20 @@ Mediator
             }
         }
 
-        protected static Task<byte[]> SerializeContentAsync<TRequest>(TRequest request)
+        protected static ReadOnlyMemory<byte> SerializeContent<TRequest>(TRequest request)
         {
-            return SerializeContentAsync((object?)request);
+            AssertConcrete<TRequest>();
+            var bufferWriter = new ArrayBufferWriter<byte>();
+            // This uses a different, faster overload than the non-generic one.
+            TypeModel.Serialize(bufferWriter, request);
+            return bufferWriter.WrittenMemory;
         }
 
-        protected static async Task<byte[]> SerializeContentAsync(object? request)
+        protected static ReadOnlyMemory<byte> SerializeContent(object? request)
         {
-            using var serializationStream = new MemoryStream();
-            TypeModel.Serialize(serializationStream, request);
-            serializationStream.Position = 0;
-            var buffer = new byte[serializationStream.Length];
-            await serializationStream.ReadAsync(buffer).ConfigureAwait(false);
-            return buffer;
+            var bufferWriter = new ArrayBufferWriter<byte>();
+            TypeModel.Serialize(bufferWriter, request);
+            return bufferWriter.WrittenMemory;
         }
 
         /// <summary>
@@ -111,19 +115,30 @@ Mediator
             return Requests.TryGetValue(message.Name, out var value) ? value : null;
         }
 
-        private protected static object DeserializeContent(Message message, Type contentType)
+        private protected static object DeserializeContent(Message message, [DynamicallyAccessedMembers(DynamicAccess.ContractType)] Type contentType)
         {
-            var x = new ReadOnlySpan<byte>(message.Content);
-            var messageContent = TypeModel.Deserialize(contentType, x);
+            var messageContent = TypeModel.Deserialize(contentType, message.Content.Span);
             return messageContent;
         }
 
-        private protected static TContent DeserializeContent<TContent>(Message message)
-            => (TContent)DeserializeContent(message, typeof(TContent));
+        private protected static TContent DeserializeContent<[DynamicallyAccessedMembers(DynamicAccess.ContractType)] TContent>(Message message)
+        {
+            AssertConcrete<TContent>();
+            // This uses a different, faster overload than the non-generic one.
+            var messageContent = TypeModel.Deserialize<TContent>(message.Content.Span);
+            return messageContent;
+        }
 
         protected internal static Exception GetAsyncStreamNotSupportedException()
         {
             throw new NotSupportedException("Stream methods are not implemented by MediatR.IPC.");
+        }
+
+        [Conditional("DEBUG")]
+        private static void AssertConcrete<TRequest>()
+        {
+            Debug.Assert(!typeof(TRequest).IsAbstract && !typeof(TRequest).IsInterface && typeof(TRequest) != typeof(object),
+                            "Expected a concrete type than can be serialized.");
         }
     }
 }

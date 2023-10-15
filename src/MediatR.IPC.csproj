@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
+    <TargetFrameworks>net7.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
     <LangVersion>latest</LangVersion>
-    <AssemblyName>MediatR.IPC</AssemblyName>
+    <AssemblyName>Mediator.IPC</AssemblyName>
     <RootNamespace>MediatR.IPC</RootNamespace>
     <Authors>Trym Lund Flogard</Authors>
     <Company>Konfluent AS</Company>
@@ -18,8 +18,11 @@
     <PackageTags>mediatr mediator ipc inter-process</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Version>4.1.0</Version>
-	  <DebugType>embedded</DebugType>
-	  <Configurations>Debug;Release;Mediator</Configurations>
+	<DebugType>embedded</DebugType>
+	<Configurations>Debug;Release;Mediator</Configurations>
+	<UseMediator>true</UseMediator>
+	<IsAotCompatible>true</IsAotCompatible>
+	<IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
   <ItemGroup>

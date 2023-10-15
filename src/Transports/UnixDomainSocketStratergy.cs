@@ -50,7 +50,7 @@ Mediator.IPC
                 }
                 else
                 {
-                    Socket socket;
+                    Socket? socket;
                     lock (ServerSockets)
                     {
                         if (!ServerSockets.TryGetValue(streamName, out socket))

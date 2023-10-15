@@ -64,7 +64,7 @@ Mediator.IPC
             }
             else
             {
-                var responseSerialized = await SerializeContentAsync(response).ConfigureAwait(false);
+                var responseSerialized = SerializeContent(response);
                 responseMessage = new Message(request.Name, responseSerialized);
             }
             token.ThrowIfCancellationRequested();

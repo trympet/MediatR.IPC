@@ -8,6 +8,7 @@ using Mediator.IPC.Messages;
 using ProtoBuf.Meta;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -22,6 +23,7 @@ Mediator
     {
         private static readonly Type NotificationType = typeof(INotification);
         private static readonly Type RequestType = typeof(IRequest<>);
+        [DynamicallyAccessedMembers(DynamicAccess.ContractType | DynamicallyAccessedMemberTypes.Interfaces)]
         private static readonly Type UnitType = typeof(Unit);
         private static TypeModel? CurrentTypeModel;
 
@@ -41,6 +43,7 @@ Mediator
         /// </summary>
         /// <param name="assembly">The assembly to register types from.</param>
         /// <returns>A builder to constrain the types that are to be registered.</returns>
+        [RequiresUnreferencedCode("Dynamic access of assembly types.")]
         public static IPCBuilder<Assembly, IEnumerable<Type>> RegisterAssemblyTypes(Assembly assembly)
         {
             var types = assembly.ExportedTypes;
@@ -69,7 +72,7 @@ Mediator
         /// <typeparam name="T">Return type of the request</typeparam>
         /// <param name="request">The request to register</param>
         /// <returns>A builder for registering more requests.</returns>
-        public static void RegisterType<T>()
+        public static void RegisterType<[DynamicallyAccessedMembers(DynamicAccess.ContractType | DynamicallyAccessedMemberTypes.Interfaces)] T>()
             where T : IBaseRequest
         {
             var requestType = typeof(T);
@@ -84,7 +87,7 @@ Mediator
         /// </remarks>
         /// <param name="request">The concrete type of the request; an instance of <see cref="MediatR.IRequest{TResponse}"/>.</param>
         /// <param name="response">The type corresponding to the <c>TResponse</c> type argument in <see cref="MediatR.IRequest{TResponse}"/>.</param>
-        public static void RegisterType(Type request, Type response)
+        public static void RegisterType([DynamicallyAccessedMembers(DynamicAccess.ContractType)] Type request, [DynamicallyAccessedMembers(DynamicAccess.ContractType)] Type response)
         {
             AddRequest(new Request(request, response));
         }
@@ -93,6 +96,7 @@ Mediator
         /// Registers a list of request types.
         /// </summary>
         /// <param name="types"></param>
+        [RequiresUnreferencedCode("Unable to annotate params array.")]
         public static void RegisterTypes(params Type[] types)
         {
             foreach (var request in types)
@@ -127,20 +131,24 @@ Mediator
             var unfinalizedTypes = UnfinalizedRequests.SelectMany(r => r.Value);
             foreach (var unfinalized in unfinalizedTypes)
             {
+#pragma warning disable IL2072 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
                 AddRequest(Finalize(unfinalized));
+#pragma warning restore IL2072 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
             }
 
             UnfinalizedRequests.Clear();
         }
 
-        private static Request Finalize(Type request)
+        private static Request Finalize([DynamicallyAccessedMembers(DynamicAccess.ContractType | DynamicallyAccessedMemberTypes.Interfaces)] Type request)
         {
             var response = request.GetInterfaces()
                 .FirstOrDefault(i => i == RequestType)
                 ?.GenericTypeArguments
                 ?.FirstOrDefault();
 
+#pragma warning disable IL2072 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
             return new Request(request, response ?? UnitType);
+#pragma warning restore IL2072 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
         }
 
         private static void AddRequest(Request request) => Requests[request.Name] = request;

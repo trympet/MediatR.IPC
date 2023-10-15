@@ -24,7 +24,7 @@ Mediator.IPC.Messages
         /// <summary>
         /// Instantiates a new instance of a Message with a binary content.
         /// </summary>
-        public Message(string Name, byte[] content)
+        public Message(string Name, ReadOnlyMemory<byte> content)
         {
             this.Name = Name;
             Content = content;
@@ -56,7 +56,7 @@ Mediator.IPC.Messages
         public MessageType MessageType { get; set; }
 
         [ProtoMember(3)]
-        public byte[] Content { get; set; } = Array.Empty<byte>();
+        public ReadOnlyMemory<byte> Content { get; set; } = Array.Empty<byte>();
 
         [ProtoMember(4)]
         public bool HasError { get; private set; }
@@ -186,12 +186,9 @@ Mediator.IPC.Messages
                             }
                         case 3:
                             {
-                                byte[] content = value.Content;
+                                ReadOnlyMemory<byte> content = value.Content;
                                 content = state.AppendBytes(content);
-                                if (content != null)
-                                {
-                                    value.Content = content;
-                                }
+                                value.Content = content;
                                 break;
                             }
                         case 4:
@@ -236,13 +233,10 @@ Mediator.IPC.Messages
                     byte b = (byte)(int)messageType;
                     state.WriteByte(b);
                 }
-                byte[] content = value.Content;
-                if (content != null)
-                {
-                    state.WriteFieldHeader(3, WireType.String);
-                    byte[] array = content;
-                    state.WriteBytes(array);
-                }
+                ReadOnlyMemory<byte> content = value.Content;
+                state.WriteFieldHeader(3, WireType.String);
+                ReadOnlyMemory<byte> array = content;
+                state.WriteBytes(array);
                 bool hasError = value.HasError;
                 if (hasError)
                 {

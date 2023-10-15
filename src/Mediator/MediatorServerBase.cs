@@ -49,13 +49,27 @@ Mediator.IPC
         {
             while (!LifetimeToken.IsCancellationRequested)
             {
-                await using var stream = await CreateAndRegisterStreamAsync(StreamType.ServerStream).ConfigureAwait(false);
-                var message = await Message.Deserialize(stream, LifetimeToken).ConfigureAwait(false);
-                var request = FindRequest(message)
-                    ?? throw new InvalidOperationException($"Request not recognized: {message.Name}");
+                try
+                {
+                    await using var stream = await CreateAndRegisterStreamAsync(StreamType.ServerStream).ConfigureAwait(false);
+                    var message = await Message.Deserialize(stream, LifetimeToken).ConfigureAwait(false);
+                    var request = FindRequest(message)
+                        ?? throw new InvalidOperationException($"Request not recognized: {message.Name}");
 
-                var messageContent = DeserializeContent(message, request.RequestType);
-                await ProcessMessage(request, messageContent, stream).ConfigureAwait(false);
+                    var messageContent = DeserializeContent(message, request.RequestType);
+                    await ProcessMessage(request, messageContent, stream).ConfigureAwait(false);
+                }
+                catch (IOException ex)
+                {
+                    if (LifetimeToken.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException("The message processing was cancelled by means of an IO error.", ex, LifetimeToken);
+                    }
+                }
+                catch (OperationCanceledException) when (!LifetimeToken.IsCancellationRequested)
+                {
+                    // Something caused the message to be interrupted.
+                }
             }
         }
 
