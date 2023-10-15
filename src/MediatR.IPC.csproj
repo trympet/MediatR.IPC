@@ -5,8 +5,6 @@
     <Nullable>enable</Nullable>
     <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
     <LangVersion>latest</LangVersion>
-    <AssemblyName>Mediator.IPC</AssemblyName>
-    <RootNamespace>MediatR.IPC</RootNamespace>
     <Authors>Trym Lund Flogard</Authors>
     <Company>Konfluent AS</Company>
     <Description>An IPC implementation of MediatR with support for Named Pipes and Unix Domain Sockets using Protobuf. Register IPC requests with assembly scanning or fluent registration. Support for connection pooling and request cancellation.</Description>
@@ -18,10 +16,15 @@
     <PackageTags>mediatr mediator ipc inter-process</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Version>4.1.0</Version>
-	<DebugType>embedded</DebugType>
-	<Configurations>Debug;Release;Mediator</Configurations>
-	<IsAotCompatible>true</IsAotCompatible>
-	<IsTrimmable>true</IsTrimmable>
+    <Configurations>Debug;Release;Mediator</Configurations>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RootNamespace>MediatR.IPC</RootNamespace>
+    <AssemblyName>MediatR.IPC</AssemblyName>
+    <AssemblyName Condition="'$(UseMediator)' == 'true'">Mediator.IPC</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
